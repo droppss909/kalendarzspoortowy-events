@@ -31,12 +31,41 @@ class CreateAttendeeAction extends BaseAction
     {
         $this->isActionAuthorized($eventId, EventDomainObject::class);
 
+        $validationData = $request->validationData();
+        
+        // Jeśli użytkownik jest zalogowany, automatycznie wypełnij dane z jego konta
+        if ($this->isUserAuthenticated()) {
+            $user = $this->getAuthenticatedUser();
+            
+            // Wypełnij dane tylko jeśli nie zostały podane w request
+            // Używamy isset() i sprawdzamy czy wartość nie jest pusta
+            if (!isset($validationData['email']) || $validationData['email'] === '') {
+                $validationData['email'] = $user->getEmail();
+            }
+            if (!isset($validationData['first_name']) || $validationData['first_name'] === '') {
+                $validationData['first_name'] = $user->getFirstName();
+            }
+            if ((!isset($validationData['last_name']) || $validationData['last_name'] === '') && $user->getLastName()) {
+                $validationData['last_name'] = $user->getLastName();
+            }
+            if (!isset($validationData['locale']) || $validationData['locale'] === '') {
+                $validationData['locale'] = $user->getLocale();
+            }
+        }
+
         try {
-            $attendee = $this->createAttendeeHandler->handle(CreateAttendeeDTO::fromArray(
-                array_merge($request->validationData(), [
-                    'event_id' => $eventId,
-                ])
-            ));
+            $attendee = $this->createAttendeeHandler->handle(
+                CreateAttendeeDTO::fromArray(
+                    array_merge(
+                        $validationData,
+                        [
+                            'event_id' => $eventId,
+                            // 🔥 Nowe pole: przypisujemy user_id, jeśli jest zalogowany
+                            'user_id' => $this->isUserAuthenticated() ? $this->getAuthenticatedUser()->getId() : null,
+                        ]
+                    )
+                )
+            );
         } catch (NoTicketsAvailableException $exception) {
             throw ValidationException::withMessages([
                 'product_id' => $exception->getMessage(),
@@ -53,4 +82,5 @@ class CreateAttendeeAction extends BaseAction
             statusCode: ResponseCodes::HTTP_CREATED
         );
     }
+
 }

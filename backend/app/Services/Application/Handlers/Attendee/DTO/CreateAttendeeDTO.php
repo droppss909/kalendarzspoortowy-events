@@ -21,7 +21,11 @@ class CreateAttendeeDTO extends BaseDTO
         public readonly ?int        $product_price_id = null,
         #[CollectionOf(CreateAttendeeTaxAndFeeDTO::class)]
         public readonly ?Collection $taxes_and_fees = null,
+
+        // 🔥 NOWE POLE:
+        public readonly ?int        $user_id = null,
     )
     {
     }
 }
+

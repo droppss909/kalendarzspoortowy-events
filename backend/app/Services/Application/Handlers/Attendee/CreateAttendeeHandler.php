@@ -233,6 +233,9 @@ class CreateAttendeeHandler
             AttendeeDomainObjectAbstract::PUBLIC_ID => IdHelper::publicId(IdHelper::ATTENDEE_PREFIX),
             AttendeeDomainObjectAbstract::SHORT_ID => IdHelper::shortId(IdHelper::ATTENDEE_PREFIX),
             AttendeeDomainObjectAbstract::LOCALE => $attendeeDTO->locale,
+
+            // NOWE POLE – zapisujemy powiązanie z userem:
+            AttendeeDomainObjectAbstract::USER_ID => $attendeeDTO->user_id,
         ]);
     }
 
