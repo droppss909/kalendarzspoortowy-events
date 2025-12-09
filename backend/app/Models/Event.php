@@ -7,6 +7,7 @@ namespace HiEvents\Models;
 use HiEvents\DomainObjects\Generated\EventDomainObjectAbstract;
 use HiEvents\Models\Traits\HasImages;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -79,6 +80,13 @@ class Event extends BaseModel
     public function affiliates(): HasMany
     {
         return $this->hasMany(Affiliate::class);
+    }
+
+    public function favorited_by(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'event_favorites')
+            ->withTimestamps()
+            ->wherePivotNull('event_favorites.deleted_at');
     }
 
     public static function boot(): void

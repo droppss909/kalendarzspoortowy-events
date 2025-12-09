@@ -84,4 +84,11 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
         return $this->hasOne(AccountUser::class)
             ->where('account_id', static::getCurrentAccountId());
     }
+
+    public function favorite_events(): BelongsToMany
+    {
+        return $this->belongsToMany(Event::class, 'event_favorites')
+            ->withTimestamps()
+            ->wherePivotNull('event_favorites.deleted_at');
+    }
 }

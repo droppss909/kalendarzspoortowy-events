@@ -52,6 +52,7 @@ use HiEvents\Http\Actions\Events\GetEventAction;
 use HiEvents\Http\Actions\Events\GetEventPublicAction;
 use HiEvents\Http\Actions\Events\GetEventsAction;
 use HiEvents\Http\Actions\Events\GetOrganizerEventsPublicAction;
+use HiEvents\Http\Actions\Events\FavoriteEventAction;
 use HiEvents\Http\Actions\Events\Images\CreateEventImageAction;
 use HiEvents\Http\Actions\Events\Images\DeleteEventImageAction;
 use HiEvents\Http\Actions\Events\Images\GetEventImagesAction;
@@ -245,6 +246,7 @@ $router->middleware(['auth:api'])->group(
         $router->put('/events/{event_id}', UpdateEventAction::class);
         $router->put('/events/{event_id}/status', UpdateEventStatusAction::class);
         $router->post('/events/{event_id}/duplicate', DuplicateEventAction::class);
+        $router->post('/events/{event_id}/favorite', FavoriteEventAction::class);
 
         // Product Categories
         $router->post('/events/{event_id}/product-categories', CreateProductCategoryAction::class);
