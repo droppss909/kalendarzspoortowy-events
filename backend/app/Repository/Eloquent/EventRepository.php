@@ -83,4 +83,36 @@ class EventRepository extends BaseRepository implements EventRepositoryInterface
             page: $params->page,
         );
     }
+
+    public function findEventsForUser(int $userId, QueryParamsDTO $params): LengthAwarePaginator
+    {
+        $where = [];
+
+        // Join z attendees, żeby znaleźć eventy dla użytkownika
+        // Używamy distinct() żeby uniknąć duplikatów gdy użytkownik ma wiele attendees dla tego samego eventu
+        $this->model = $this->model
+            ->join('attendees', 'attendees.event_id', '=', 'events.id')
+            ->where('attendees.user_id', $userId)
+            ->whereNull('attendees.deleted_at')
+            ->select('events.*')
+            ->distinct();
+
+        if (!empty($params->query)) {
+            $where[] = static function (Builder $builder) use ($params) {
+                $builder
+                    ->where(EventDomainObjectAbstract::TITLE, 'ilike', '%' . $params->query . '%');
+            };
+        }
+
+        $this->model = $this->model->orderBy(
+            $params->sort_by ?? EventDomainObject::getDefaultSort(),
+            $params->sort_direction ?? EventDomainObject::getDefaultSortDirection(),
+        );
+
+        return $this->paginateWhere(
+            where: $where,
+            limit: $params->per_page,
+            page: $params->page,
+        );
+    }
 }

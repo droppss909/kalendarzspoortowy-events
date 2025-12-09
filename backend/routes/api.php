@@ -145,6 +145,7 @@ use HiEvents\Http\Actions\Users\ConfirmEmailWithCodeAction;
 use HiEvents\Http\Actions\Users\CreateUserAction;
 use HiEvents\Http\Actions\Users\DeleteInvitationAction;
 use HiEvents\Http\Actions\Users\GetMeAction;
+use HiEvents\Http\Actions\Users\GetMyEventsAction;
 use HiEvents\Http\Actions\Users\GetUserAction;
 use HiEvents\Http\Actions\Users\GetUsersAction;
 use HiEvents\Http\Actions\Users\ResendEmailConfirmationAction;
@@ -191,6 +192,7 @@ $router->middleware(['auth:api'])->group(
 
         // Users
         $router->get('/users/me', GetMeAction::class);
+        $router->get('/users/me/events', GetMyEventsAction::class);
         $router->put('/users/me', UpdateMeAction::class);
         $router->post('/users', CreateUserAction::class);
         $router->get('/users', GetUsersAction::class);
@@ -232,13 +234,11 @@ $router->middleware(['auth:api'])->group(
         $router->post('/organizers/{organizerId}/email-templates/preview', PreviewOrganizerEmailTemplateAction::class);
         $router->get('/email-templates/tokens/{templateType}', GetAvailableTokensAction::class);
 
-        // Taxes and Fees
         $router->post('/accounts/{account_id}/taxes-and-fees', CreateTaxOrFeeAction::class);
         $router->get('/accounts/{account_id}/taxes-and-fees', GetTaxOrFeeAction::class);
         $router->put('/accounts/{account_id}/taxes-and-fees/{tax_or_fee_id}', EditTaxOrFeeAction::class);
         $router->delete('/accounts/{account_id}/taxes-and-fees/{tax_or_fee_id}', DeleteTaxOrFeeAction::class);
 
-        // Events
         $router->post('/events', CreateEventAction::class);
         $router->get('/events', GetEventsAction::class);
         $router->get('/events/{event_id}', GetEventAction::class);
