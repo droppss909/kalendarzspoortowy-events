@@ -32,6 +32,7 @@ class EditAttendeeAction extends BaseAction
             $updatedAttendee = $this->handler->handle(EditAttendeeDTO::fromArray([
                 'first_name' => $request->input('first_name'),
                 'last_name' => $request->input('last_name'),
+                'club_name' => $request->input('club_name'),
                 'email' => $request->input('email'),
                 'product_id' => $request->input('product_id'),
                 'product_price_id' => $request->input('product_price_id'),

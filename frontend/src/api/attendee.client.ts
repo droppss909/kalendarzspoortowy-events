@@ -7,6 +7,7 @@ import {SupportedLocales} from "../locales.ts";
 export interface EditAttendeeRequest {
     first_name: string;
     last_name: string;
+    club_name: string;
     email: string;
     notes?: string;
     product_id?: IdParam;

@@ -13,21 +13,26 @@ import {queryParamsHelper} from "../utilites/queryParamsHelper.ts";
 export interface OrderDetails {
     first_name: string,
     last_name: string,
+    club_name: string,
     email: string,
+    address?: any,
+    questions?: any,
 }
 
-export interface AttendeeDetails extends OrderDetails {
-    product_id: number,
+export interface AttendeeDetails extends Pick<OrderDetails, 'first_name' | 'last_name' | 'club_name' | 'email' | 'questions'> {
+    product_id: IdParam;
+    product_price_id: IdParam;
 }
 
 export interface FinaliseOrderPayload {
-    order: OrderDetails,
-    attendees: AttendeeDetails[],
+    order: OrderDetails;
+    products: AttendeeDetails[];
 }
 
 export interface EditOrderPayload {
     first_name: string,
     last_name: string,
+    club_name: string,
     email: string,
     notes: string,
 }

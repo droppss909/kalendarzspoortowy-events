@@ -17,6 +17,7 @@ use HiEvents\Http\Actions\Attendees\EditAttendeeAction;
 use HiEvents\Http\Actions\Attendees\ExportAttendeesAction;
 use HiEvents\Http\Actions\Attendees\GetAttendeeAction;
 use HiEvents\Http\Actions\Attendees\GetAttendeeActionPublic;
+use HiEvents\Http\Actions\Attendees\GetAttendeesListPublicAction;
 use HiEvents\Http\Actions\Attendees\GetAttendeesAction;
 use HiEvents\Http\Actions\Attendees\PartialEditAttendeeAction;
 use HiEvents\Http\Actions\Attendees\ResendAttendeeTicketAction;
@@ -393,6 +394,7 @@ $router->prefix('/public')->group(
         $router->get('/events/{event_id}/order/{order_short_id}/invoice', DownloadOrderInvoicePublicAction::class);
 
         // Attendees
+        $router->get('/events/{event_id}/attendees', GetAttendeesListPublicAction::class);
         $router->get('/events/{event_id}/attendees/{attendee_short_id}', GetAttendeeActionPublic::class);
 
         // Promo codes

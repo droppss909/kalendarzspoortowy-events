@@ -11,6 +11,7 @@ class EditOrderDTO extends BaseDTO
         public int     $eventId,
         public string  $firstName,
         public string  $lastName,
+        public string  $clubName,
         public string  $email,
         public ?string $notes,
     )

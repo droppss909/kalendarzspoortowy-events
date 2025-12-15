@@ -11,6 +11,7 @@ class CreateAttendeeDTO extends BaseDTO
     public function __construct(
         public readonly string      $first_name,
         public readonly string      $last_name,
+        public readonly string      $club_name,
         public readonly string      $email,
         public readonly int         $product_id,
         public readonly int         $event_id,
@@ -28,4 +29,3 @@ class CreateAttendeeDTO extends BaseDTO
     {
     }
 }
-

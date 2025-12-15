@@ -42,6 +42,7 @@ export const ManageOrderModal = ({onClose, orderId}: GenericModalProps & ManageO
         initialValues: {
             first_name: "",
             last_name: "",
+            club_name: "",
             email: "",
             notes: "",
         },
@@ -52,6 +53,7 @@ export const ManageOrderModal = ({onClose, orderId}: GenericModalProps & ManageO
             form.initialize({
                 first_name: order.first_name,
                 last_name: order.last_name,
+                club_name: order.club_name || "",
                 email: order.email,
                 notes: order.notes || "",
             });
@@ -138,25 +140,31 @@ export const ManageOrderModal = ({onClose, orderId}: GenericModalProps & ManageO
     const editContent = (
         <form onSubmit={form.onSubmit(handleSubmit)}>
             <Stack gap="xs">
-                <InputGroup>
-                    <TextInput
-                        {...form.getInputProps("first_name")}
-                        label={t`First name`}
-                        placeholder={t`Homer`}
-                        required
-                    />
-                    <TextInput
-                        {...form.getInputProps("last_name")}
-                        label={t`Last name`}
-                        placeholder={t`Simpson`}
-                        required
-                    />
-                </InputGroup>
+            <InputGroup>
                 <TextInput
-                    {...form.getInputProps("email")}
-                    label={t`Email address`}
-                    placeholder="homer@simpson.com"
+                    {...form.getInputProps("first_name")}
+                    label={t`First name`}
+                    placeholder={t`Homer`}
                     required
+                />
+                <TextInput
+                    {...form.getInputProps("last_name")}
+                    label={t`Last name`}
+                    placeholder={t`Simpson`}
+                    required
+                />
+            </InputGroup>
+            <TextInput
+                {...form.getInputProps("club_name")}
+                label={t`Club`}
+                placeholder={t`Club`}
+                required
+            />
+            <TextInput
+                {...form.getInputProps("email")}
+                label={t`Email address`}
+                placeholder="homer@simpson.com"
+                required
                 />
                 <Textarea
                     label={

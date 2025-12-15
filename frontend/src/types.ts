@@ -519,6 +519,7 @@ export interface Attendee {
     first_name: string;
     last_name: string;
     email: string;
+    club_name?: string;
     notes?: string;
     order?: Order;
     public_id: string;
@@ -571,6 +572,7 @@ export interface Order {
     event_id: IdParam;
     first_name: string;
     last_name: string;
+    club_name?: string;
     company_name: string;
     address: Address;
     payment_provider: PaymentProvider;

@@ -28,15 +28,17 @@ class EditOrderService
         int     $eventId,
         ?string $firstName,
         ?string $lastName,
+        ?string $clubName,
         ?string $email,
         ?string $notes
     ): OrderDomainObject
     {
-        return $this->databaseManager->transaction(function () use ($id, $firstName, $lastName, $email, $notes, $eventId) {
+        return $this->databaseManager->transaction(function () use ($id, $firstName, $lastName, $clubName, $email, $notes, $eventId) {
             $this->orderRepository->updateWhere(
                 attributes: array_filter([
                     'first_name' => $firstName,
                     'last_name' => $lastName,
+                    'club_name' => $clubName,
                     'email' => $email,
                     'notes' => $notes,
                 ]),

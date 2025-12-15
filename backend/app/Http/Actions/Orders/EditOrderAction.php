@@ -27,6 +27,7 @@ class EditOrderAction extends BaseAction
             eventId: $eventId,
             firstName: $request->validated('first_name'),
             lastName: $request->validated('last_name'),
+            clubName: $request->validated('club_name'),
             email: $request->validated('email'),
             notes: $request->validated('notes'),
         ));

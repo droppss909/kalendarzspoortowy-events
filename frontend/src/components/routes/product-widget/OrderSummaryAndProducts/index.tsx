@@ -13,7 +13,8 @@ import {
     IconMapPin,
     IconMenuOrder,
     IconPrinter,
-    IconUser
+    IconUser,
+    IconUsers
 } from "@tabler/icons-react";
 
 import {useGetOrderPublic} from "../../../../queries/useGetOrderPublic.ts";
@@ -107,6 +108,13 @@ const OrderDetails = ({order, event}: { order: Order, event: Event }) => (
                 label={t`Name`}
                 value={`${order.first_name} ${order.last_name}`}
             />
+            {order.club_name && (
+                <DetailItem
+                    icon={IconUsers}
+                    label={t`Club`}
+                    value={order.club_name}
+                />
+            )}
             <DetailItem
                 icon={IconId}
                 label={t`Order Reference`}

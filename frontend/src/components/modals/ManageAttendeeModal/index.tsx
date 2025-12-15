@@ -44,6 +44,7 @@ export const ManageAttendeeModal = ({onClose, attendeeId}: ManageAttendeeModalPr
         initialValues: {
             first_name: "",
             last_name: "",
+            club_name: "",
             email: "",
             notes: "",
             product_id: "",
@@ -58,6 +59,7 @@ export const ManageAttendeeModal = ({onClose, attendeeId}: ManageAttendeeModalPr
             form.initialize({
                 first_name: attendee.first_name,
                 last_name: attendee.last_name,
+                club_name: attendee.club_name || "",
                 email: attendee.email,
                 notes: attendee.notes || "",
                 product_id: String(attendee.product_id),
@@ -110,6 +112,7 @@ export const ManageAttendeeModal = ({onClose, attendeeId}: ManageAttendeeModalPr
                 <TextInput {...form.getInputProps("first_name")} label={t`First name`} placeholder={t`Homer`} required/>
                 <TextInput {...form.getInputProps("last_name")} label={t`Last name`} placeholder={t`Simpson`} required/>
             </InputGroup>
+            <TextInput {...form.getInputProps("club_name")} label={t`Club`} placeholder={t`Club`} required/>
             <InputGroup>
                 <TextInput {...form.getInputProps("email")} label={t`Email address`} placeholder="homer@simpson.com"
                            required/>

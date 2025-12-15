@@ -30,6 +30,7 @@ class OrderResource extends BaseResource
             'currency' => $this->getCurrency(),
             'first_name' => $this->getFirstName(),
             'last_name' => $this->getLastName(),
+            'club_name' => $this->getClubName(),
             'email' => $this->getEmail(),
             'created_at' => $this->getCreatedAt(),
             'public_id' => $this->getPublicId(),

@@ -27,6 +27,7 @@ class CompleteOrderActionPublic extends BaseAction
                 'order' => CompleteOrderOrderDTO::fromArray([
                     'first_name' => $request->validated('order.first_name'),
                     'last_name' => $request->validated('order.last_name'),
+                    'club_name' => $request->validated('order.club_name'),
                     'email' => $request->validated('order.email'),
                     'address' => $request->validated('order.address'),
                     'questions' => $request->has('order.questions')

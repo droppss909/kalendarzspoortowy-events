@@ -26,6 +26,16 @@ export const OrderDetails = ({order, event, cardVariant = 'lightGray', style = {
                     {order.first_name} {order.last_name}
                 </div>
             </div>
+            {order.club_name && (
+                <div className={classes.block}>
+                    <div className={classes.title}>
+                        {t`Club`}
+                    </div>
+                    <div className={classes.amount}>
+                        {order.club_name}
+                    </div>
+                </div>
+            )}
             <div className={classes.block}>
                 <div className={classes.title}>
                     {t`Email`}

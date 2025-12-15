@@ -149,6 +149,7 @@ class CompleteOrderHandler
                 AttendeeDomainObjectAbstract::EMAIL => $attendee->email,
                 AttendeeDomainObjectAbstract::FIRST_NAME => $attendee->first_name,
                 AttendeeDomainObjectAbstract::LAST_NAME => $attendee->last_name,
+                AttendeeDomainObjectAbstract::CLUB_NAME => $attendee->club_name,
                 AttendeeDomainObjectAbstract::ORDER_ID => $order->getId(),
                 AttendeeDomainObjectAbstract::PUBLIC_ID => IdHelper::publicId(IdHelper::ATTENDEE_PREFIX),
                 AttendeeDomainObjectAbstract::SHORT_ID => $shortId,
@@ -284,6 +285,7 @@ class CompleteOrderHandler
                     OrderDomainObjectAbstract::ADDRESS => $orderDTO->address,
                     OrderDomainObjectAbstract::FIRST_NAME => $orderDTO->first_name,
                     OrderDomainObjectAbstract::LAST_NAME => $orderDTO->last_name,
+                    OrderDomainObjectAbstract::CLUB_NAME => $orderDTO->club_name,
                     OrderDomainObjectAbstract::EMAIL => $orderDTO->email,
                     OrderDomainObjectAbstract::PAYMENT_STATUS => $order->isPaymentRequired()
                         ? OrderPaymentStatus::AWAITING_PAYMENT->name

@@ -71,6 +71,7 @@ class EditAttendeeHandler
         return $this->attendeeRepository->updateByIdWhere($editAttendeeDTO->attendee_id, [
             'first_name' => $editAttendeeDTO->first_name,
             'last_name' => $editAttendeeDTO->last_name,
+            'club_name' => $editAttendeeDTO->club_name,
             'email' => $editAttendeeDTO->email,
             'product_id' => $editAttendeeDTO->product_id,
             'product_price_id' => $editAttendeeDTO->product_price_id,

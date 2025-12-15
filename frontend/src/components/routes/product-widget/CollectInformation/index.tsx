@@ -64,6 +64,7 @@ export const CollectInformation = () => {
             order: {
                 first_name: "",
                 last_name: "",
+                club_name: "",
                 email: "",
                 address: {},
                 questions: {},
@@ -71,6 +72,7 @@ export const CollectInformation = () => {
             products: [{
                 first_name: "",
                 last_name: "",
+                club_name: "",
                 email: "",
                 product_price_id: "",
                 product_id: "",
@@ -97,6 +99,7 @@ export const CollectInformation = () => {
                     first_name: form.values.order.first_name,
                     last_name: form.values.order.last_name,
                     email: form.values.order.email,
+                    club_name: form.values.order.club_name,
                 };
             }
             return product;
@@ -158,6 +161,7 @@ export const CollectInformation = () => {
                     product_id: orderItem?.product_id,
                     first_name: "",
                     last_name: "",
+                    club_name: "",
                     email: "",
                     questions: productIdToQuestionMap.get(orderItem?.product_id)?.map((question: Question) => {
                         return {
@@ -302,6 +306,13 @@ export const CollectInformation = () => {
 
                     <TextInput
                         withAsterisk
+                        label={t`Club`}
+                        placeholder={t`Club`}
+                        {...form.getInputProps("order.club_name")}
+                    />
+
+                    <TextInput
+                        withAsterisk
                         type={"email"}
                         label={t`Email Address`}
                         placeholder={t`Email Address`}
@@ -397,24 +408,31 @@ export const CollectInformation = () => {
                                             {productRequiresDetails && (
                                                 <>
                                                     <InputGroup>
-                                                        <TextInput
-                                                            withAsterisk
-                                                            label={t`First Name`}
-                                                            placeholder={t`First name`}
-                                                            {...form.getInputProps(`products.${productIndex}.first_name`)}
-                                                        />
-                                                        <TextInput
-                                                            withAsterisk
-                                                            label={t`Last Name`}
-                                                            placeholder={t`Last Name`}
-                                                            {...form.getInputProps(`products.${productIndex}.last_name`)}
-                                                        />
-                                                    </InputGroup>
-
                                                     <TextInput
                                                         withAsterisk
-                                                        label={t`Email Address`}
-                                                        placeholder={t`Email Address`}
+                                                        label={t`First Name`}
+                                                        placeholder={t`First name`}
+                                                        {...form.getInputProps(`products.${productIndex}.first_name`)}
+                                                        />
+                                                        <TextInput
+                                                        withAsterisk
+                                                        label={t`Last Name`}
+                                                        placeholder={t`Last Name`}
+                                                        {...form.getInputProps(`products.${productIndex}.last_name`)}
+                                                    />
+                                                </InputGroup>
+
+                                                <TextInput
+                                                    withAsterisk
+                                                    label={t`Club`}
+                                                    placeholder={t`Club`}
+                                                    {...form.getInputProps(`products.${productIndex}.club_name`)}
+                                                />
+
+                                                <TextInput
+                                                    withAsterisk
+                                                    label={t`Email Address`}
+                                                    placeholder={t`Email Address`}
                                                         {...form.getInputProps(`products.${productIndex}.email`)}
                                                     />
                                                 </>

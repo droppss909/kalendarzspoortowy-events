@@ -17,6 +17,7 @@ class CompleteOrderProductDataDTO extends BaseDTO
         public readonly ?string     $first_name = null,
         public readonly ?string     $last_name = null,
         public readonly ?string     $email = null,
+        public readonly ?string     $club_name = null,
     )
     {
     }
@@ -25,6 +26,7 @@ class CompleteOrderProductDataDTO extends BaseDTO
     {
         return $this->first_name !== null
             && $this->last_name !== null
-            && $this->email !== null;
+            && $this->email !== null
+            && $this->club_name !== null;
     }
 }

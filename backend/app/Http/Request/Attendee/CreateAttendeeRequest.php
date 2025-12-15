@@ -20,6 +20,7 @@ class CreateAttendeeRequest extends BaseRequest
             'email' => $isAuthenticated ? ['nullable', 'email'] : ['required', 'email'],
             'first_name' => $isAuthenticated ? ['nullable', 'string', 'max:40'] : ['string', 'required', 'max:40'],
             'last_name' => ['string', 'max:40', 'nullable'],
+            'club_name' => ['required', 'string', 'max:150'],
             'amount_paid' => ['required', ...RulesHelper::MONEY],
             'send_confirmation_email' => ['required', 'boolean'],
             'taxes_and_fees' => ['array'],

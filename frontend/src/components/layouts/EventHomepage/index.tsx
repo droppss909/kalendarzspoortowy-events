@@ -297,7 +297,7 @@ const EventHomepage = ({colors, continueButtonText, backgroundType, ...loaderDat
                     )}
 
                     {/* Footer Section */}
-                    <div className={classes.contentSection}>
+                    {/* <div className={classes.contentSection}>
                         <div className={classes.sectionContent}>
                             <footer className={classes.footerSection}>
                                 <div className={classes.footerContent}>
@@ -322,7 +322,7 @@ const EventHomepage = ({colors, continueButtonText, backgroundType, ...loaderDat
                                 </div>
                             </footer>
                         </div>
-                    </div>
+                    </div> */}
 
                     {/* Floating Scroll to Tickets Button */}
                     {showScrollButton && (

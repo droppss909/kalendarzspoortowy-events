@@ -74,6 +74,7 @@ class CompleteOrderValidator extends BaseValidator
         return [
             'order.first_name' => ['required', 'string', 'max:40'],
             'order.last_name' => ['required', 'string', 'max:40'],
+            'order.club_name' => ['required', 'string', 'max:150'],
             'order.questions' => new OrderQuestionRule($orderQuestions, $products),
             'order.email' => 'required|email',
             'products' => new ProductQuestionRule($productQuestions, $products),
@@ -88,6 +89,8 @@ class CompleteOrderValidator extends BaseValidator
             'order.last_name.max' => 'Last name must be under 40 characters',
             'order.first_name.required' => __('First name is required'),
             'order.last_name.required' => __('Last name is required'),
+            'order.club_name.required' => __('Club name is required'),
+            'order.club_name.max' => __('Club name must be under 150 characters'),
             'order.email' => __('A valid email is required'),
             'order.address.address_line_1.required' => __('Address line 1 is required'),
             'order.address.city.required' => __('City is required'),

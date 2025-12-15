@@ -20,6 +20,7 @@ class AttendeeResourcePublic extends JsonResource
             'status' => $this->getStatus(),
             'first_name' => $this->getFirstName(),
             'last_name' => $this->getLastName(),
+            'club_name' => $this->getClubName(),
             'public_id' => $this->getPublicId(),
             'short_id' => $this->getShortId(),
             'product_id' => $this->getProductId(),

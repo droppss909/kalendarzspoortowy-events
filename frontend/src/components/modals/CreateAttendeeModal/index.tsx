@@ -37,6 +37,7 @@ export const CreateAttendeeModal = ({onClose}: GenericModalProps) => {
             email: '',
             first_name: '',
             last_name: '',
+            club_name: '',
             amount_paid: 0.00,
             send_confirmation_email: true,
             taxes_and_fees: [],
@@ -138,6 +139,12 @@ export const CreateAttendeeModal = ({onClose}: GenericModalProps) => {
                         required
                     />
                 </InputGroup>
+                <TextInput
+                    {...form.getInputProps('club_name')}
+                    label={t`Club`}
+                    placeholder={t`Club`}
+                    required
+                />
                 <TextInput
                     {...form.getInputProps('email')}
                     label={t`Email address`}

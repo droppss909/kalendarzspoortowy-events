@@ -35,6 +35,7 @@ class OrderResourcePublic extends BaseResource
             ),
             'first_name' => $this->getFirstName(),
             'last_name' => $this->getLastName(),
+            'club_name' => $this->getClubName(),
             'email' => $this->getEmail(),
             'public_id' => $this->getPublicId(),
             'is_payment_required' => $this->isPaymentRequired(),

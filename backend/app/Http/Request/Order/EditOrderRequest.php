@@ -13,6 +13,7 @@ class EditOrderRequest extends BaseRequest
             'email' => RulesHelper::REQUIRED_EMAIL,
             'first_name' => RulesHelper::REQUIRED_STRING,
             'last_name' => RulesHelper::REQUIRED_STRING,
+            'club_name' => ['required', 'string', 'max:150'],
             'notes' => RulesHelper::OPTIONAL_TEXT_MEDIUM_LENGTH,
         ];
     }

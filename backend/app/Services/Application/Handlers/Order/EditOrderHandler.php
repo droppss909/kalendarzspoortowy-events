@@ -31,6 +31,7 @@ class EditOrderHandler
             eventId: $dto->eventId,
             firstName: $dto->firstName,
             lastName: $dto->lastName,
+            clubName: $dto->clubName,
             email: $dto->email,
             notes: $dto->notes
         );

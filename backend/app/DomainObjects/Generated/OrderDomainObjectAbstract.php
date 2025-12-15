@@ -22,6 +22,7 @@ abstract class OrderDomainObjectAbstract extends \HiEvents\DomainObjects\Abstrac
     final public const FIRST_NAME = 'first_name';
     final public const LAST_NAME = 'last_name';
     final public const EMAIL = 'email';
+    final public const CLUB_NAME = 'club_name';
     final public const STATUS = 'status';
     final public const PAYMENT_STATUS = 'payment_status';
     final public const REFUND_STATUS = 'refund_status';
@@ -56,6 +57,7 @@ abstract class OrderDomainObjectAbstract extends \HiEvents\DomainObjects\Abstrac
     protected ?string $first_name = null;
     protected ?string $last_name = null;
     protected ?string $email = null;
+    protected ?string $club_name = null;
     protected string $status;
     protected ?string $payment_status = null;
     protected ?string $refund_status = null;
@@ -93,6 +95,7 @@ abstract class OrderDomainObjectAbstract extends \HiEvents\DomainObjects\Abstrac
                     'first_name' => $this->first_name ?? null,
                     'last_name' => $this->last_name ?? null,
                     'email' => $this->email ?? null,
+                    'club_name' => $this->club_name ?? null,
                     'status' => $this->status ?? null,
                     'payment_status' => $this->payment_status ?? null,
                     'refund_status' => $this->refund_status ?? null,
@@ -247,6 +250,17 @@ abstract class OrderDomainObjectAbstract extends \HiEvents\DomainObjects\Abstrac
     public function getEmail(): ?string
     {
         return $this->email;
+    }
+
+    public function setClubName(?string $club_name): self
+    {
+        $this->club_name = $club_name;
+        return $this;
+    }
+
+    public function getClubName(): ?string
+    {
+        return $this->club_name;
     }
 
     public function setStatus(string $status): self
