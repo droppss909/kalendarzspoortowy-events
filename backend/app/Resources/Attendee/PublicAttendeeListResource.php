@@ -17,7 +17,7 @@ class PublicAttendeeListResource extends JsonResource
             'first_name' => $this->getFirstName(),
             'last_name' => $this->getLastName(),
             'club_name' => $this->getClubName(),
-            'age_category' => null, // placeholder for future age category
+            'age_category' => $this->getAgeCategory(),
         ];
     }
 }

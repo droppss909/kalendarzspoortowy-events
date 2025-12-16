@@ -51,6 +51,9 @@ class CreateAttendeeAction extends BaseAction
             if (!isset($validationData['locale']) || $validationData['locale'] === '') {
                 $validationData['locale'] = $user->getLocale();
             }
+            if (!isset($validationData['birth_date']) || $validationData['birth_date'] === '') {
+                $validationData['birth_date'] = $user->getBirthDate();
+            }
         }
 
         try {

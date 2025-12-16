@@ -31,6 +31,8 @@ abstract class AttendeeDomainObjectAbstract extends \HiEvents\DomainObjects\Abst
     final public const LOCALE = 'locale';
     final public const NOTES = 'notes';
     final public const USER_ID = 'user_id';
+    final public const BIRTH_DATE = 'birth_date';
+    final public const AGE_CATEGORY = 'age_category';
 
     protected int $id;
     protected int $order_id;
@@ -53,6 +55,8 @@ abstract class AttendeeDomainObjectAbstract extends \HiEvents\DomainObjects\Abst
     protected string $locale = 'en';
     protected ?string $notes = null;
     protected ?int $user_id = null;
+    protected ?string $birth_date = null;
+    protected ?string $age_category = null;
 
     public function toArray(): array
     {
@@ -78,6 +82,8 @@ abstract class AttendeeDomainObjectAbstract extends \HiEvents\DomainObjects\Abst
                     'locale' => $this->locale ?? null,
                     'notes' => $this->notes ?? null,
                     'user_id' => $this->user_id ?? null,
+                    'birth_date' => $this->birth_date ?? null,
+                    'age_category' => $this->age_category ?? null,
                 ];
     }
 
@@ -310,5 +316,27 @@ abstract class AttendeeDomainObjectAbstract extends \HiEvents\DomainObjects\Abst
     public function getUserId(): ?int
     {
         return $this->user_id;
+    }
+
+    public function setBirthDate(?string $birth_date): self
+    {
+        $this->birth_date = $birth_date;
+        return $this;
+    }
+
+    public function getBirthDate(): ?string
+    {
+        return $this->birth_date;
+    }
+
+    public function setAgeCategory(?string $age_category): self
+    {
+        $this->age_category = $age_category;
+        return $this;
+    }
+
+    public function getAgeCategory(): ?string
+    {
+        return $this->age_category;
     }
 }

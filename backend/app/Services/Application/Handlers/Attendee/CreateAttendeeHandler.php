@@ -231,6 +231,8 @@ class CreateAttendeeHandler
             AttendeeDomainObjectAbstract::FIRST_NAME => $attendeeDTO->first_name,
             AttendeeDomainObjectAbstract::LAST_NAME => $attendeeDTO->last_name,
             AttendeeDomainObjectAbstract::CLUB_NAME => $attendeeDTO->club_name,
+            AttendeeDomainObjectAbstract::BIRTH_DATE => $attendeeDTO->birth_date,
+            AttendeeDomainObjectAbstract::AGE_CATEGORY => $attendeeDTO->age_category,
             AttendeeDomainObjectAbstract::ORDER_ID => $order->getId(),
             AttendeeDomainObjectAbstract::PUBLIC_ID => IdHelper::publicId(IdHelper::ATTENDEE_PREFIX),
             AttendeeDomainObjectAbstract::SHORT_ID => IdHelper::shortId(IdHelper::ATTENDEE_PREFIX),

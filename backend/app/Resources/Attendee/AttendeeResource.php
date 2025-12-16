@@ -29,6 +29,8 @@ class AttendeeResource extends JsonResource
             'first_name' => $this->getFirstName(),
             'last_name' => $this->getLastName(),
             'club_name' => $this->getClubName(),
+            'birth_date' => $this->getBirthDate(),
+            'age_category' => $this->getAgeCategory(),
             'public_id' => $this->getPublicId(),
             'short_id' => $this->getShortId(),
             'locale' => $this->getLocale(),
