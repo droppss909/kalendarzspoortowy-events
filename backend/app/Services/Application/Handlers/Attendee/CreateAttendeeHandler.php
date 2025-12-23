@@ -3,6 +3,7 @@
 namespace HiEvents\Services\Application\Handlers\Attendee;
 
 use Brick\Money\Money;
+use Carbon\CarbonImmutable;
 use HiEvents\DomainObjects\AttendeeDomainObject;
 use HiEvents\DomainObjects\Enums\ProductType;
 use HiEvents\DomainObjects\Generated\AttendeeDomainObjectAbstract;
@@ -35,6 +36,7 @@ use HiEvents\Services\Infrastructure\DomainEvents\Enums\DomainEventType;
 use HiEvents\Services\Infrastructure\DomainEvents\Events\OrderEvent;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use RuntimeException;
 use Throwable;
 
@@ -98,7 +100,12 @@ class CreateAttendeeHandler
 
             $orderItem = $this->createOrderItem($attendeeDTO, $order, $product, $productPriceId);
 
-            $attendee = $this->createAttendee($order, $attendeeDTO);
+            $resolvedAgeCategory = $this->resolveAgeCategoryFromTicket(
+                productId: $attendeeDTO->product_id,
+                birthDate: $attendeeDTO->birth_date
+            );
+
+            $attendee = $this->createAttendee($order, $attendeeDTO, $resolvedAgeCategory);
 
             $this->orderManagementService->updateOrderTotals($order, collect([$orderItem]));
 
@@ -220,7 +227,7 @@ class CreateAttendeeHandler
         );
     }
 
-    private function createAttendee(OrderDomainObject $order, CreateAttendeeDTO $attendeeDTO): AttendeeDomainObject
+    private function createAttendee(OrderDomainObject $order, CreateAttendeeDTO $attendeeDTO, ?string $resolvedAgeCategory = null): AttendeeDomainObject
     {
         return $this->attendeeRepository->create([
             AttendeeDomainObjectAbstract::EVENT_ID => $order->getEventId(),
@@ -232,7 +239,7 @@ class CreateAttendeeHandler
             AttendeeDomainObjectAbstract::LAST_NAME => $attendeeDTO->last_name,
             AttendeeDomainObjectAbstract::CLUB_NAME => $attendeeDTO->club_name,
             AttendeeDomainObjectAbstract::BIRTH_DATE => $attendeeDTO->birth_date,
-            AttendeeDomainObjectAbstract::AGE_CATEGORY => $attendeeDTO->age_category,
+            AttendeeDomainObjectAbstract::AGE_CATEGORY => $resolvedAgeCategory ?? $attendeeDTO->age_category,
             AttendeeDomainObjectAbstract::ORDER_ID => $order->getId(),
             AttendeeDomainObjectAbstract::PUBLIC_ID => IdHelper::publicId(IdHelper::ATTENDEE_PREFIX),
             AttendeeDomainObjectAbstract::SHORT_ID => IdHelper::shortId(IdHelper::ATTENDEE_PREFIX),
@@ -260,5 +267,51 @@ class CreateAttendeeHandler
         $this->domainEventDispatcherService->dispatch(
             new OrderEvent(DomainEventType::ORDER_CREATED, $order->getId())
         );
+    }
+
+    private function resolveAgeCategoryFromTicket(int $productId, ?string $birthDate): ?string
+    {
+        if ($birthDate === null) {
+            return null;
+        }
+
+        $assignment = DB::table('ticket_age_rule_assignment')->where('ticket_id', $productId)->first();
+
+        if ($assignment === null) {
+            return null;
+        }
+
+        $rule = DB::table('age_category_rules')
+            ->where('id', $assignment->rule_id)
+            ->where('is_active', true)
+            ->first();
+
+        if ($rule === null || $rule->calc_mode !== 'BY_AGE') {
+            return null;
+        }
+
+        $ruleData = is_string($rule->rule) ? json_decode($rule->rule, true) : $rule->rule;
+
+        if (!is_array($ruleData) || !isset($ruleData['bins']) || !is_array($ruleData['bins'])) {
+            return null;
+        }
+
+        $age = CarbonImmutable::parse($birthDate)->age;
+
+        foreach ($ruleData['bins'] as $bin) {
+            $min = $bin['min'] ?? null;
+            $max = $bin['max'] ?? null;
+            $label = $bin['label'] ?? null;
+
+            if (!is_numeric($min) || !is_numeric($max) || !is_string($label)) {
+                continue;
+            }
+
+            if ($age >= (float)$min && $age <= (float)$max) {
+                return $label;
+            }
+        }
+
+        return null;
     }
 }

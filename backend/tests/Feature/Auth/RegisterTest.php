@@ -50,6 +50,7 @@ class RegisterTest extends TestCase
             'timezone' => $user->timezone,
             'currency_code' => $account->currency_code,
             'locale' => $user->locale,
+            'birth_date' => '1990-01-01',
             'invite_token' => null,
         ]);
 
@@ -88,6 +89,7 @@ class RegisterTest extends TestCase
             'timezone' => $user->timezone,
             'currency_code' => $account->currency_code,
             'locale' => $user->locale,
+            'birth_date' => '1990-01-01',
             'invite_token' => null,
         ]);
 
@@ -108,6 +110,7 @@ class RegisterTest extends TestCase
             'timezone' => $user->timezone,
             'currency_code' => $account->currency_code,
             'locale' => $user->locale,
+            'birth_date' => '1990-01-01',
             'invite_token' => null,
         ];
 
@@ -138,6 +141,7 @@ class RegisterTest extends TestCase
             'timezone' => $user->timezone,
             'currency_code' => $account->currency_code,
             'locale' => $user->locale,
+            'birth_date' => '1990-01-01',
         ];
         Config::set('app.disable_registration', false);
 

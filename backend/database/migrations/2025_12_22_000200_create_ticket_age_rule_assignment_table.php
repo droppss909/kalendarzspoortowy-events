@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('ticket_age_rule_assignment', static function (Blueprint $table) {
             $table->foreignId('ticket_id')
                 ->primary()
-                ->constrained('tickets')
+                ->constrained('products')
                 ->cascadeOnDelete();
 
             $table->foreignId('rule_id')

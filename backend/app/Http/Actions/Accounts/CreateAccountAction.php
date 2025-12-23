@@ -46,6 +46,7 @@ class CreateAccountAction extends BaseAuthAction
                 'password' => $request->validated('password'),
                 'timezone' => $request->validated('timezone'),
                 'currency_code' => $request->validated('currency_code'),
+                'birth_date' => $request->validated('birth_date'),
                 'locale' => $request->has('locale')
                     ? $request->validated('locale')
                     : $this->localeService->getLocaleOrDefault($request->getPreferredLanguage()),

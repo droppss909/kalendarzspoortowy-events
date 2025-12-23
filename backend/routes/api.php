@@ -5,6 +5,7 @@ use HiEvents\Http\Actions\Accounts\GetAccountAction;
 use HiEvents\Http\Actions\Accounts\Stripe\CreateStripeConnectAccountAction;
 use HiEvents\Http\Actions\Accounts\Stripe\GetStripeConnectAccountsAction;
 use HiEvents\Http\Actions\Accounts\UpdateAccountAction;
+use HiEvents\Http\Actions\AgeCategoryRules\AssignTicketAgeRuleAction;
 use HiEvents\Http\Actions\Affiliates\CreateAffiliateAction;
 use HiEvents\Http\Actions\Affiliates\DeleteAffiliateAction;
 use HiEvents\Http\Actions\Affiliates\ExportAffiliatesAction;
@@ -263,6 +264,7 @@ $router->middleware(['auth:api'])->group(
         $router->get('/events/{event_id}/products/{ticket_id}', GetProductAction::class);
         $router->delete('/events/{event_id}/products/{ticket_id}', DeleteProductAction::class);
         $router->get('/events/{event_id}/products', GetProductsAction::class);
+        $router->post('/events/{event_id}/products/{ticket_id}/age-category-rule', AssignTicketAgeRuleAction::class);
 
         // Stats
         $router->get('/events/{event_id}/stats', GetEventStatsAction::class);

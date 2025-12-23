@@ -68,15 +68,26 @@ class CreateAccountHandler
                 'account_configuration_id' => $this->getAccountConfigurationId($accountData),
             ]);
 
-            $user = $this->getExistingUser($accountData) ?? $this->userRepository->create([
+            $existingUser = $this->getExistingUser($accountData);
+            $user = $existingUser ?? $this->userRepository->create([
                 'password' => $passwordHash,
                 'email' => strtolower($accountData->email),
                 'first_name' => $accountData->first_name,
                 'last_name' => $accountData->last_name,
                 'timezone' => $this->getTimezone($accountData),
                 'email_verified_at' => $isSaasMode ? null : now()->toDateTimeString(),
+                'birth_date' => $accountData->birth_date,
                 'locale' => $accountData->locale,
             ]);
+
+            if ($existingUser !== null && $existingUser->getBirthDate() === null) {
+                $this->userRepository->updateWhere(
+                    attributes: ['birth_date' => $accountData->birth_date],
+                    where: ['id' => $existingUser->getId()],
+                );
+
+                $user->setBirthDate($accountData->birth_date);
+            }
 
             $this->accountUserAssociationService->associate(
                 user: $user,

@@ -33,27 +33,14 @@ class CreateAttendeeAction extends BaseAction
 
         $validationData = $request->validationData();
         
-        // Jeśli użytkownik jest zalogowany, automatycznie wypełnij dane z jego konta
+        // Jeśli użytkownik jest zalogowany, użyj danych z jego konta zamiast z payloadu
         if ($this->isUserAuthenticated()) {
             $user = $this->getAuthenticatedUser();
-            
-            // Wypełnij dane tylko jeśli nie zostały podane w request
-            // Używamy isset() i sprawdzamy czy wartość nie jest pusta
-            if (!isset($validationData['email']) || $validationData['email'] === '') {
-                $validationData['email'] = $user->getEmail();
-            }
-            if (!isset($validationData['first_name']) || $validationData['first_name'] === '') {
-                $validationData['first_name'] = $user->getFirstName();
-            }
-            if ((!isset($validationData['last_name']) || $validationData['last_name'] === '') && $user->getLastName()) {
-                $validationData['last_name'] = $user->getLastName();
-            }
-            if (!isset($validationData['locale']) || $validationData['locale'] === '') {
-                $validationData['locale'] = $user->getLocale();
-            }
-            if (!isset($validationData['birth_date']) || $validationData['birth_date'] === '') {
-                $validationData['birth_date'] = $user->getBirthDate();
-            }
+            $validationData['email'] = $user->getEmail();
+            $validationData['first_name'] = $user->getFirstName();
+            $validationData['last_name'] = $user->getLastName();
+            $validationData['locale'] = $user->getLocale();
+            $validationData['birth_date'] = $user->getBirthDate();
         }
 
         try {

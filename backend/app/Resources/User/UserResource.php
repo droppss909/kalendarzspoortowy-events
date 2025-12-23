@@ -23,6 +23,7 @@ class UserResource extends BaseResource
             'is_email_verified' => $this->getEmailVerifiedAt() !== null,
             'has_pending_email_change' => $this->getPendingEmail() !== null,
             'locale' => $this->getLocale(),
+            'birth_date' => $this->getBirthDate(),
             $this->mergeWhen(config('app.enforce_email_confirmation_during_registration'), fn() => [
                 'enforce_email_confirmation_during_registration' => true,
             ]),

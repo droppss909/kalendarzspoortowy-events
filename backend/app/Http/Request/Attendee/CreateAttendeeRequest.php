@@ -10,6 +10,17 @@ use Illuminate\Validation\Rule;
 
 class CreateAttendeeRequest extends BaseRequest
 {
+    protected function prepareForValidation(): void
+    {
+        if (Auth::check() && (!$this->has('birth_date') || $this->input('birth_date') === '')) {
+            $user = Auth::user();
+
+            if ($user !== null && $user->birth_date !== null && $user->birth_date !== '') {
+                $this->merge(['birth_date' => $user->birth_date]);
+            }
+        }
+    }
+
     public function rules(): array
     {
         $isAuthenticated = Auth::check();
@@ -20,7 +31,7 @@ class CreateAttendeeRequest extends BaseRequest
             'email' => $isAuthenticated ? ['nullable', 'email'] : ['required', 'email'],
             'first_name' => $isAuthenticated ? ['nullable', 'string', 'max:40'] : ['string', 'required', 'max:40'],
             'last_name' => ['string', 'max:40', 'nullable'],
-            'birth_date' => $isAuthenticated ? ['nullable', 'date'] : ['required', 'date'],
+            'birth_date' => ['required', 'date'],
             'age_category' => ['nullable', 'string', 'max:10'],
             'club_name' => ['required', 'string', 'max:150'],
             'amount_paid' => ['required', ...RulesHelper::MONEY],

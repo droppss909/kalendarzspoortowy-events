@@ -23,6 +23,7 @@ abstract class UserDomainObjectAbstract extends \HiEvents\DomainObjects\Abstract
     final public const PENDING_EMAIL = 'pending_email';
     final public const TIMEZONE = 'timezone';
     final public const LOCALE = 'locale';
+    final public const BIRTH_DATE = 'birth_date';
 
     protected int $id;
     protected string $email;
@@ -37,6 +38,7 @@ abstract class UserDomainObjectAbstract extends \HiEvents\DomainObjects\Abstract
     protected ?string $pending_email = null;
     protected string $timezone;
     protected string $locale = 'en';
+    protected ?string $birth_date = null;
 
     public function toArray(): array
     {
@@ -54,6 +56,7 @@ abstract class UserDomainObjectAbstract extends \HiEvents\DomainObjects\Abstract
                     'pending_email' => $this->pending_email ?? null,
                     'timezone' => $this->timezone ?? null,
                     'locale' => $this->locale ?? null,
+                    'birth_date' => $this->birth_date ?? null,
                 ];
     }
 
@@ -198,5 +201,16 @@ abstract class UserDomainObjectAbstract extends \HiEvents\DomainObjects\Abstract
     public function getLocale(): string
     {
         return $this->locale;
+    }
+
+    public function setBirthDate(?string $birth_date): self
+    {
+        $this->birth_date = $birth_date;
+        return $this;
+    }
+
+    public function getBirthDate(): ?string
+    {
+        return $this->birth_date;
     }
 }

@@ -21,7 +21,7 @@ return new class extends Migration {
         });
 
         // CHECK constraints validate the JSON structure and enforce the only supported calc_mode value.
-        DB::statement("
+        DB::unprepared("
             ALTER TABLE age_category_rules
             ADD CONSTRAINT age_category_rules_calc_mode_check CHECK (calc_mode = 'BY_AGE'),
             ADD CONSTRAINT age_category_rules_rule_has_bins CHECK (rule ? 'bins'),
