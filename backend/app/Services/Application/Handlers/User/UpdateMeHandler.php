@@ -43,7 +43,10 @@ readonly class UpdateMeHandler
                 'timezone' => $updateUserData->timezone,
                 'locale' => $updateUserData->locale,
                 'birth_date' => $updateUserData->birth_date,
+                'gender' => $updateUserData->gender,
             ];
+
+            $updateArray = array_filter($updateArray, static fn($value) => $value !== null);
 
             if ($this->isChangingEmail($updateUserData, $existingUser)) {
                 $updateArray['pending_email'] = $updateUserData->email;
@@ -115,6 +118,7 @@ readonly class UpdateMeHandler
             || $updateUserData->last_name !== null
             || $updateUserData->timezone !== null
             || $updateUserData->email !== null
-            || $updateUserData->birth_date !== null;
+            || $updateUserData->birth_date !== null
+            || $updateUserData->gender !== null;
     }
 }

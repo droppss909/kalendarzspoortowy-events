@@ -62,7 +62,7 @@ export const StatBoxes = () => {
             number: formatCurrency(eventStats?.total_gross_sales || 0, event?.currency),
             description: t`Gross sales`,
             icon: <IconCash size={18}/>,
-            backgroundColor: '#7C63E6' // Purple
+            backgroundColor: '#2563EB' // Bright blue
         },
         {
             number: formatNumber(eventStats?.total_views as number),

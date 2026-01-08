@@ -45,6 +45,7 @@ class AssignTicketAgeRuleTest extends TestCase
             'currency_code' => 'USD',
             'locale' => 'en',
             'birth_date' => '1990-01-01',
+            'gender' => 'F',
             'invite_token' => null,
         ]);
 

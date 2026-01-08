@@ -21,6 +21,7 @@ class UpdateMeRequest extends BaseRequest
             'timezone' => 'required_without_all:current_password,password,password_confirmation|timezone',
             'locale' => 'required_without_all:current_password,password,password_confirmation|in:' . implode(',', Locale::getSupportedLocales()),
             'birth_date' => 'nullable|date',
+            'gender' => 'nullable|string|max:20',
 
             'current_password' => [
                 'required_with:password,password_confirmation',

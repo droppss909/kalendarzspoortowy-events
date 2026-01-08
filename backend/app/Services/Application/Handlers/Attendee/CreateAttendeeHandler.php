@@ -102,7 +102,8 @@ class CreateAttendeeHandler
 
             $resolvedAgeCategory = $this->resolveAgeCategoryFromTicket(
                 productId: $attendeeDTO->product_id,
-                birthDate: $attendeeDTO->birth_date
+                birthDate: $attendeeDTO->birth_date,
+                gender: $attendeeDTO->gender,
             );
 
             $attendee = $this->createAttendee($order, $attendeeDTO, $resolvedAgeCategory);
@@ -229,6 +230,19 @@ class CreateAttendeeHandler
 
     private function createAttendee(OrderDomainObject $order, CreateAttendeeDTO $attendeeDTO, ?string $resolvedAgeCategory = null): AttendeeDomainObject
     {
+        $ageCategory = $resolvedAgeCategory ?? $attendeeDTO->age_category;
+
+        if ($attendeeDTO->gender !== null) {
+            $genderPrefix = strtoupper($attendeeDTO->gender);
+
+            if ($ageCategory === null) {
+                $ageCategory = $genderPrefix;
+            } elseif (!preg_match('/^(M|F)/i', $ageCategory)) {
+                // Prefix gender when the category label does not already contain it.
+                $ageCategory = $genderPrefix . $ageCategory;
+            }
+        }
+
         return $this->attendeeRepository->create([
             AttendeeDomainObjectAbstract::EVENT_ID => $order->getEventId(),
             AttendeeDomainObjectAbstract::PRODUCT_ID => $attendeeDTO->product_id,
@@ -239,7 +253,7 @@ class CreateAttendeeHandler
             AttendeeDomainObjectAbstract::LAST_NAME => $attendeeDTO->last_name,
             AttendeeDomainObjectAbstract::CLUB_NAME => $attendeeDTO->club_name,
             AttendeeDomainObjectAbstract::BIRTH_DATE => $attendeeDTO->birth_date,
-            AttendeeDomainObjectAbstract::AGE_CATEGORY => $resolvedAgeCategory ?? $attendeeDTO->age_category,
+            AttendeeDomainObjectAbstract::AGE_CATEGORY => $ageCategory,
             AttendeeDomainObjectAbstract::ORDER_ID => $order->getId(),
             AttendeeDomainObjectAbstract::PUBLIC_ID => IdHelper::publicId(IdHelper::ATTENDEE_PREFIX),
             AttendeeDomainObjectAbstract::SHORT_ID => IdHelper::shortId(IdHelper::ATTENDEE_PREFIX),
@@ -269,7 +283,7 @@ class CreateAttendeeHandler
         );
     }
 
-    private function resolveAgeCategoryFromTicket(int $productId, ?string $birthDate): ?string
+    private function resolveAgeCategoryFromTicket(int $productId, ?string $birthDate, ?string $gender): ?string
     {
         if ($birthDate === null) {
             return null;
@@ -297,19 +311,38 @@ class CreateAttendeeHandler
         }
 
         $age = CarbonImmutable::parse($birthDate)->age;
+        $normalizedGender = $gender !== null ? strtoupper($gender) : null;
 
         foreach ($ruleData['bins'] as $bin) {
             $min = $bin['min'] ?? null;
             $max = $bin['max'] ?? null;
-            $label = $bin['label'] ?? null;
+            $ageCategory = $bin['age_category'] ?? null;
+            $binGender = $bin['gender'] ?? null;
 
-            if (!is_numeric($min) || !is_numeric($max) || !is_string($label)) {
+            if (!is_numeric($min) || !is_numeric($max) || !is_string($ageCategory)) {
                 continue;
             }
 
-            if ($age >= (float)$min && $age <= (float)$max) {
-                return $label;
+            $isInRange = $age >= (float)$min && $age <= (float)$max;
+
+            if (!$isInRange) {
+                continue;
             }
+
+            if (is_string($binGender) && $binGender !== '') {
+                if ($normalizedGender === null) {
+                    continue;
+                }
+                if (strtoupper($binGender) !== $normalizedGender) {
+                    continue;
+                }
+            }
+
+            if ($normalizedGender !== null && !preg_match('/^(M|F)/i', $ageCategory)) {
+                return $normalizedGender . $ageCategory;
+            }
+
+            return $ageCategory;
         }
 
         return null;

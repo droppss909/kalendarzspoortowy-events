@@ -41,6 +41,7 @@ class CreateAttendeeAction extends BaseAction
             $validationData['last_name'] = $user->getLastName();
             $validationData['locale'] = $user->getLocale();
             $validationData['birth_date'] = $user->getBirthDate();
+            $validationData['gender'] = $user->getGender();
         }
 
         try {
@@ -52,6 +53,9 @@ class CreateAttendeeAction extends BaseAction
                             'event_id' => $eventId,
                             // 🔥 Nowe pole: przypisujemy user_id, jeśli jest zalogowany
                             'user_id' => $this->isUserAuthenticated() ? $this->getAuthenticatedUser()->getId() : null,
+                            'gender' => $this->isUserAuthenticated()
+                                ? $this->getAuthenticatedUser()->getGender()
+                                : $validationData['gender'],
                         ]
                     )
                 )

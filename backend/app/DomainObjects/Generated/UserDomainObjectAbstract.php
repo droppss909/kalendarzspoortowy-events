@@ -24,6 +24,7 @@ abstract class UserDomainObjectAbstract extends \HiEvents\DomainObjects\Abstract
     final public const TIMEZONE = 'timezone';
     final public const LOCALE = 'locale';
     final public const BIRTH_DATE = 'birth_date';
+    final public const GENDER = 'gender';
 
     protected int $id;
     protected string $email;
@@ -39,6 +40,7 @@ abstract class UserDomainObjectAbstract extends \HiEvents\DomainObjects\Abstract
     protected string $timezone;
     protected string $locale = 'en';
     protected ?string $birth_date = null;
+    protected ?string $gender = null;
 
     public function toArray(): array
     {
@@ -57,6 +59,7 @@ abstract class UserDomainObjectAbstract extends \HiEvents\DomainObjects\Abstract
                     'timezone' => $this->timezone ?? null,
                     'locale' => $this->locale ?? null,
                     'birth_date' => $this->birth_date ?? null,
+                    'gender' => $this->gender ?? null,
                 ];
     }
 
@@ -212,5 +215,16 @@ abstract class UserDomainObjectAbstract extends \HiEvents\DomainObjects\Abstract
     public function getBirthDate(): ?string
     {
         return $this->birth_date;
+    }
+
+    public function setGender(?string $gender): self
+    {
+        $this->gender = $gender;
+        return $this;
+    }
+
+    public function getGender(): ?string
+    {
+        return $this->gender;
     }
 }

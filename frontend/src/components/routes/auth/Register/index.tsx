@@ -1,12 +1,10 @@
-import {Button, PasswordInput, SimpleGrid, TextInput} from "@mantine/core";
+import {Button, PasswordInput, Select, SimpleGrid, TextInput} from "@mantine/core";
 import {hasLength, isEmail, matchesField, useForm} from "@mantine/form";
 import {RegisterAccountRequest} from "../../../../types.ts";
 import {useFormErrorResponseHandler} from "../../../../hooks/useFormErrorResponseHandler.tsx";
 import {useRegisterAccount} from "../../../../mutations/useRegisterAccount.ts";
 import {NavLink, useLocation, useNavigate} from "react-router";
 import {t, Trans} from "@lingui/macro";
-import {InputGroup} from "../../../common/InputGroup";
-import {Card} from "../../../common/Card";
 import classes from "./Register.module.scss";
 import {getClientLocale} from "../../../../locales.ts";
 import React, {useEffect} from "react";
@@ -24,6 +22,8 @@ export const Register = () => {
             first_name: '',
             last_name: '',
             email: '',
+            birth_date: '',
+            gender: '',
             password: '',
             password_confirmation: '',
             timezone: typeof window !== 'undefined'
@@ -37,15 +37,18 @@ export const Register = () => {
             password: hasLength({min: 8}, t`Password must be at least 8 characters`),
             password_confirmation: matchesField('password', t`Passwords are not the same`),
             email: isEmail(t`Please check your email is valid`),
+            birth_date: (value) => value ? null : t`Date of birth is required`,
+            gender: (value) => value ? null : t`Gender is required`,
         },
     });
     const errorHandler = useFormErrorResponseHandler();
     const mutate = useRegisterAccount();
+    const today = new Date().toISOString().split('T')[0];
 
     const registerUser = (data: RegisterAccountRequest) => {
         mutate.mutate({registerData: data}, {
             onSuccess: () => {
-                navigate('/welcome');
+                navigate('/manage/user/dashboard');
             },
             onError: (error: any) => {
                 errorHandler(form, error, error.response?.data?.message);
@@ -62,10 +65,15 @@ export const Register = () => {
         }
     }, [location.search]);
 
+    const genderOptions = [
+        {value: 'female', label: t`Female`},
+        {value: 'male', label: t`Male`}
+    ];
+
     return (
         <>
             <header className={classes.header}>
-                <h2>{t`Welcome to ${getConfig("VITE_APP_NAME", "Hi.Events")} 👋`}</h2>
+                <h2>{t`Welcome to ${getConfig("VITE_APP_NAME", "Kalendarz Sportowy")} 👋`}</h2>
                 <p>
                     <Trans>
                         Create an account or <NavLink to={'/auth/login'}>
@@ -89,6 +97,24 @@ export const Register = () => {
                             {...form.getInputProps('last_name')}
                             label={t`Last Name`}
                             placeholder={t`Smith`}
+                        />
+                    </SimpleGrid>
+
+                    <SimpleGrid verticalSpacing={0} cols={{base: 2, xs: 2}}>
+                        <TextInput
+                            {...form.getInputProps('birth_date')}
+                            label={t`Date of birth`}
+                            placeholder={t`YYYY-MM-DD`}
+                            type="date"
+                            max={today}
+                            required
+                        />
+                        <Select
+                            {...form.getInputProps('gender')}
+                            data={genderOptions}
+                            label={t`Gender`}
+                            placeholder={t`Select gender`}
+                            required
                         />
                     </SimpleGrid>
 

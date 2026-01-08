@@ -105,7 +105,7 @@ const GettingStarted = () => {
                                     size="md"
                                     radius="xl"
                                     className={classes.progressBar}
-                                    color="violet"
+                                    color="blue"
                                 />
                             </div>
                         </div>

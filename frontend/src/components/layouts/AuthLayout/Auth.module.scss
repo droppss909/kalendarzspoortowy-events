@@ -4,7 +4,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  height: 100vh;
   box-sizing: border-box;
 }
 
@@ -20,6 +20,7 @@
 .leftPanel {
   flex: 1;
   min-width: 0;
+  min-height: 100vh;
   position: relative;
   background: transparent;
   overflow-y: auto;
@@ -29,11 +30,16 @@
   }
 }
 
+.logohievent{
+  display: flex;
+  align-items: left;
+}
+
 .rightPanel {
   width: 50%;
   position: relative;
   overflow: hidden;
-  background-image: url("/login-background.jpg");
+  background-image: url("/login-kalendarz.jpg");
   background-size: cover;
   background-position: center;
 
@@ -42,7 +48,7 @@
     position: absolute;
     inset: 0;
     background: linear-gradient(135deg, var(--mantine-color-primary-9) 0%, var(--mantine-color-secondary-3) 100%);
-    opacity: 0.95;
+    opacity: 0.5;
   }
 
   @include mixins.respond-below(md) {
@@ -54,14 +60,66 @@
   position: absolute;
   inset: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4rem;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 10vh 6vw 4rem;
   z-index: 1; // Ensure content appears above the gradient overlay
 }
 
+.movingTextWrapper {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  transform: translateY(-50%);
+  overflow: hidden;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+}
+
+.movingText {
+  display: inline-block;
+  white-space: nowrap;
+  font-size: clamp(52px, 3vw, 75px);
+  font-weight: 1000;
+  letter-spacing: 0.02em;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+  animation: slide-to-center 3s ease-out forwards;
+}
+
+@keyframes slide-to-center {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);   // ⬅️ środek
+  }
+}
+
+.textPrimary {
+  color: #ffffff;
+}
+
+.textAccent {
+  color: #38bdf8;
+}
+
+@keyframes slide-across {
+  0% {
+    transform: translateX(-160%);
+  }
+  80% {
+    transform: translateX(160%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
 .content {
-  max-width: 440px;
+  max-width: 720px;
   width: 100%;
   position: relative;
 }
@@ -87,8 +145,11 @@
 }
 
 .featureGrid {
-  display: grid;
-  gap: 1.75rem;
+  display: flex;
+  gap: 1.25rem;
+  align-items: stretch;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .feature {
@@ -99,6 +160,12 @@
   padding: 1.25rem;
   border-radius: 1rem;
   transition: all 0.2s ease;
+  flex: 1 1 200px;
+  min-width: 200px;
+  max-width: 240px;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: feature-fade-up 0.6s ease forwards;
 
   &:hover {
     background: rgba(255, 255, 255, 0.06);
@@ -134,6 +201,29 @@
   }
 }
 
+.feature:nth-child(1) {
+  animation-delay: 0.5s;
+}
+
+.feature:nth-child(2) {
+  animation-delay: 1.5s;
+}
+
+.feature:nth-child(3) {
+  animation-delay: 2.5s;
+}
+
+@keyframes feature-fade-up {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .container {
   display: flex;
   align-items: center;
@@ -141,7 +231,7 @@
   flex-direction: column;
   background: transparent;
   box-sizing: border-box;
-  height: 100vh;
+  height: 94vh;
   padding: 0 20px;
   min-width: 250px;
 
@@ -160,7 +250,7 @@
     }
 
     img {
-      width: 140px;
+      width: 200px;
 
       @include mixins.respond-below(md) {
         width: 110px;

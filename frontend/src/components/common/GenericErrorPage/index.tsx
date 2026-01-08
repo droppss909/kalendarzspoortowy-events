@@ -67,16 +67,16 @@ export const GenericErrorPage: React.FC<GenericErrorPageProps> = ({
                             {children}
 
                             {buttonText && buttonUrl && (
-                                <Button
-                                    component="a"
-                                    href={buttonUrl}
-                                    leftSection={buttonIcon}
-                                    variant="gradient"
-                                    gradient={{from: 'purple', to: 'pink'}}
-                                    className={classes.button}
-                                >
-                                    {buttonText}
-                                </Button>
+                                    <Button
+                                        component="a"
+                                        href={buttonUrl}
+                                        leftSection={buttonIcon}
+                                        variant="gradient"
+                                        gradient={{from: 'blue', to: 'cyan'}}
+                                        className={classes.button}
+                                    >
+                                        {buttonText}
+                                    </Button>
                             )}
                         </Stack>
 

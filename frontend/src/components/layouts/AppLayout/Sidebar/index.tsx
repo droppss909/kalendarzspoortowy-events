@@ -14,6 +14,7 @@ interface SidebarProps {
     setSidebarOpen: (open: boolean) => void;
     navItems: NavItem[];
     sidebarFooter?: React.ReactNode;
+    homeLink: string;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -21,6 +22,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                                     setSidebarOpen,
                                                     navItems,
                                                     sidebarFooter,
+                                                    homeLink,
                                                 }) => {
     const renderLinks = () => {
         return navItems.map((item) => {
@@ -73,7 +75,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     return (
         <div className={classNames(`${classes.sidebar} ${sidebarOpen ? classes.open : classes.closed}`)}>
             <div className={classes.logo}>
-                <NavLink to={`/manage/events`}>
+                <NavLink to={homeLink}>
                     <img
                         style={{maxWidth: '160px', margin: "10px auto"}}
                         src={getConfig("VITE_APP_LOGO_LIGHT", "/logo-wide-white-text.svg")}

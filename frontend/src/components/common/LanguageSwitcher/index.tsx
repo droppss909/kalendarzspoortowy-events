@@ -26,6 +26,8 @@ export const LanguageSwitcher = () => {
                 return t`Dutch`;
             case "pt":
                 return t`Portuguese`;
+            case "pl":
+                return t`Polish`;
             case "pt-br":
                 return t`Brazilian Portuguese`;
             case "zh-cn":
@@ -36,6 +38,8 @@ export const LanguageSwitcher = () => {
                 return t`Vietnamese`;
             case "tr":
                 return t`Turkish`;
+            default:
+                return localeToNameMap[locale];
         }
     };
 

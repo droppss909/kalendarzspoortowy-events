@@ -36,9 +36,14 @@ export interface AcceptInvitationRequest {
     email: string;
     password: string;
     password_confirmation: string;
+    timezone: string;
 }
 
 export interface RegisterAccountRequest extends AcceptInvitationRequest {
+    birth_date: string;
+    gender: string;
+    invite_token?: string;
+    currency_code?: string;
     locale: SupportedLocales;
 }
 
@@ -408,6 +413,16 @@ export interface PaginationData {
     allowed_sorts: Record<string, SortDirectionLabel>;
     default_sort: string;
     default_sort_direction: string;
+}
+
+export interface UserEventStats {
+    total_events: number;
+    paid_events: number;
+    unpaid_events: number;
+}
+
+export interface UserEventsMeta extends PaginationData {
+    user_event_stats?: UserEventStats;
 }
 
 export interface GenericDataResponse<T> {

@@ -52,7 +52,7 @@ const Login = () => {
     return (
         <>
             <header className={classes.header}>
-                <h2>{t`Welcome back 👋`}</h2>
+                <h2>{t`Kalendarz sportowy`}</h2>
                 <p>
                     <Trans>
                         Don't have an account? {'  '}
@@ -66,7 +66,7 @@ const Login = () => {
                 <form onSubmit={form.onSubmit((values) => loginUser(values))}>
                     <TextInput {...form.getInputProps('email')}
                                label={t`Email`}
-                               placeholder="hello@example.com"
+                               placeholder={t`Your e-mail`}
                                required
                     />
                     <PasswordInput {...form.getInputProps('password')}

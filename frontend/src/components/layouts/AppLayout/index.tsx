@@ -11,11 +11,12 @@ import {t} from "@lingui/macro";
 interface AppLayoutProps {
     navItems: NavItem[];
     breadcrumbItems: BreadcrumbItem[];
-    entityType: 'event' | 'organizer';
+    entityType: 'event' | 'organizer' | 'user';
     topBarContent?: React.ReactNode;
     breadcrumbContentRight?: React.ReactNode;
     actionGroupContent?: React.ReactNode;
     sidebarFooter?: React.ReactNode;
+    homeLink?: string;
 }
 
 interface SidebarToggleButtonProps {
@@ -46,6 +47,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                                                  breadcrumbContentRight = null,
                                                  actionGroupContent = null,
                                                  sidebarFooter = null,
+                                                 homeLink = '/manage/events',
                                              }) => {
     const [sidebarOpen, setSidebarOpen] = useState<boolean>(() => {
         if (typeof window === 'undefined') return true; // SSR default
@@ -85,6 +87,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                 setSidebarOpen={setSidebarOpen}
                 topBarShadow={topBarShadow}
                 breadcrumbItems={breadcrumbItems}
+                homeLink={homeLink}
                 topBarContent={topBarContent}
                 breadcrumbContentRight={breadcrumbContentRight}
                 actionGroupContent={actionGroupContent}
@@ -98,6 +101,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                 sidebarOpen={sidebarOpen}
                 setSidebarOpen={setSidebarOpen}
                 navItems={navItems}
+                homeLink={homeLink}
                 sidebarFooter={sidebarFooter}
             />
 

@@ -1,0 +1,140 @@
+@use "../../../../styles/mixins.scss";
+
+.headerSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  @include mixins.respond-below(md) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.pageTitle {
+  margin: 0;
+  flex: 1;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.statisticsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  margin-bottom: 2rem;
+
+  > * {
+    flex: 1 1 240px;
+    min-width: 0;
+  }
+
+  @include mixins.respond-below(sm) {
+    gap: 1rem;
+
+    > * {
+      flex: 1 1 100%;
+    }
+  }
+}
+
+.statLink {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.statLink:focus-visible {
+  outline: 2px solid var(--mantine-color-primary-3);
+  outline-offset: 4px;
+  border-radius: 10px;
+}
+
+.editTile {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  border: 1px dashed rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.editTile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+.editTileTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem;
+}
+
+.editTileDescription {
+  margin: 0;
+  color: #6c757d;
+}
+
+.section {
+  margin-bottom: 2.5rem;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  color: #1a1a2e;
+}
+
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.listGrid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.listItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+}
+
+.listItemTitle {
+  font-weight: 600;
+  margin: 0;
+}
+
+.listItemMeta {
+  color: #6c757d;
+  font-size: 0.875rem;
+  margin: 0.25rem 0 0;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #6c757d;
+}

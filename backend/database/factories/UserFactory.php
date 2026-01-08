@@ -32,6 +32,7 @@ class UserFactory extends Factory
             'password' => Hash::make(fake()->password(16)),
             'timezone' => fake()->timezone(),
             'locale' => fake()->randomElement(Locale::getSupportedLocales()),
+            'gender' => fake()->randomElement(['M', 'F']),
         ];
     }
 

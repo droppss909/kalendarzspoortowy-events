@@ -1,5 +1,6 @@
 import {api} from "./client";
-import {GenericDataResponse, IdParam, InviteUserRequest, User} from "../types";
+import {Event, GenericDataResponse, GenericPaginatedResponse, IdParam, InviteUserRequest, QueryFilters, User} from "../types";
+import {queryParamsHelper} from "../utilites/queryParamsHelper.ts";
 
 export interface UserMeRequest {
     first_name: string;
@@ -50,6 +51,12 @@ export const userClient = {
     },
     me: async () => {
         const response = await api.get<GenericDataResponse<User>>('users/me');
+        return response.data;
+    },
+    myEvents: async (pagination: QueryFilters) => {
+        const response = await api.get<GenericPaginatedResponse<Event>>(
+            'users/me/events' + queryParamsHelper.buildQueryString(pagination)
+        );
         return response.data;
     },
     resendInvitation: async (userId: IdParam) => {

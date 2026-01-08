@@ -15,6 +15,7 @@ interface TopbarProps {
     topBarContent?: React.ReactNode;
     breadcrumbContentRight?: React.ReactNode;
     actionGroupContent?: React.ReactNode;
+    homeLink: string;
 }
 
 export const Topbar: React.FC<TopbarProps> = ({
@@ -22,6 +23,7 @@ export const Topbar: React.FC<TopbarProps> = ({
                                                   setSidebarOpen,
                                                   topBarShadow,
                                                   breadcrumbItems,
+                                                  homeLink,
                                                   topBarContent = null,
                                                   breadcrumbContentRight = null,
                                                   actionGroupContent = null,
@@ -38,7 +40,7 @@ export const Topbar: React.FC<TopbarProps> = ({
                     />
                 </div>
                 <div className={classes.logo}>
-                    <NavLink to={ `/manage/events` }>
+                    <NavLink to={homeLink}>
                         <img src={getConfig("VITE_APP_LOGO_LIGHT", "/logo-text-only-white-text.png")} alt={`${getConfig("VITE_APP_NAME", "Hi.Events")} logo`} className={classes.logo}/>
                     </NavLink>
                 </div>

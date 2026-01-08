@@ -78,15 +78,28 @@ class CreateAccountHandler
                 'email_verified_at' => $isSaasMode ? null : now()->toDateTimeString(),
                 'birth_date' => $accountData->birth_date,
                 'locale' => $accountData->locale,
+                'gender' => $accountData->gender,
             ]);
 
-            if ($existingUser !== null && $existingUser->getBirthDate() === null) {
-                $this->userRepository->updateWhere(
-                    attributes: ['birth_date' => $accountData->birth_date],
-                    where: ['id' => $existingUser->getId()],
-                );
+            if ($existingUser !== null && ($existingUser->getBirthDate() === null || $existingUser->getGender() === null)) {
+                $updateFields = [];
 
-                $user->setBirthDate($accountData->birth_date);
+                if ($existingUser->getBirthDate() === null) {
+                    $updateFields['birth_date'] = $accountData->birth_date;
+                    $user->setBirthDate($accountData->birth_date);
+                }
+
+                if ($existingUser->getGender() === null) {
+                    $updateFields['gender'] = $accountData->gender;
+                    $user->setGender($accountData->gender);
+                }
+
+                if ($updateFields !== []) {
+                    $this->userRepository->updateWhere(
+                        attributes: $updateFields,
+                        where: ['id' => $existingUser->getId()],
+                    );
+                }
             }
 
             $this->accountUserAssociationService->associate(

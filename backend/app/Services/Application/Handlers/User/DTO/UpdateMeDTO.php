@@ -17,6 +17,7 @@ class UpdateMeDTO extends BaseDTO
         public readonly ?string $current_password,
         public readonly ?string $locale,
         public readonly ?string $birth_date,
+        public readonly ?string $gender,
     )
     {
     }

@@ -159,6 +159,14 @@ export const OrganizerDashboard = () => {
                 <PageTitle className={classes.pageTitle}>
                     {organizer ? `${organizer.name} - ${t`Dashboard`}` : t`Organizer Dashboard`}
                 </PageTitle>
+                <Button
+                    component={NavLink}
+                    to="/manage/user/dashboard"
+                    variant="light"
+                    size="sm"
+                >
+                    {t`User Dashboard`}
+                </Button>
                 {currencies?.length > 1 && (
                     <Menu
                         shadow="md"

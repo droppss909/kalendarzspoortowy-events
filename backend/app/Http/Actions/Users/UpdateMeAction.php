@@ -37,6 +37,7 @@ class UpdateMeAction extends BaseAction
                 'timezone' => $request->validated('timezone'),
                 'locale' => $request->validated('locale'),
                 'birth_date' => $request->validated('birth_date'),
+                'gender' => $request->validated('gender'),
             ]));
 
             return $this->resourceResponse(UserResource::class, $user);

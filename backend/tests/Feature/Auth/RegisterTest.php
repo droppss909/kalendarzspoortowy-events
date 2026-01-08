@@ -51,6 +51,7 @@ class RegisterTest extends TestCase
             'currency_code' => $account->currency_code,
             'locale' => $user->locale,
             'birth_date' => '1990-01-01',
+            'gender' => 'M',
             'invite_token' => null,
         ]);
 
@@ -61,6 +62,7 @@ class RegisterTest extends TestCase
 
         $this->assertNotNull($userFromDB);
         $this->assertNotNull($accountFromDB);
+        $this->assertSame('M', $userFromDB->gender);
 
         $this->assertDatabaseHas('account_users', [
             'account_id' => $accountFromDB->id,
@@ -111,6 +113,7 @@ class RegisterTest extends TestCase
             'currency_code' => $account->currency_code,
             'locale' => $user->locale,
             'birth_date' => '1990-01-01',
+            'gender' => 'M',
             'invite_token' => null,
         ];
 
@@ -142,6 +145,7 @@ class RegisterTest extends TestCase
             'currency_code' => $account->currency_code,
             'locale' => $user->locale,
             'birth_date' => '1990-01-01',
+            'gender' => 'M',
         ];
         Config::set('app.disable_registration', false);
 

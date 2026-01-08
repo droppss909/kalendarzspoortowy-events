@@ -22,6 +22,7 @@ use HiEvents\Http\Actions\Attendees\GetAttendeesListPublicAction;
 use HiEvents\Http\Actions\Attendees\GetAttendeesAction;
 use HiEvents\Http\Actions\Attendees\PartialEditAttendeeAction;
 use HiEvents\Http\Actions\Attendees\ResendAttendeeTicketAction;
+use HiEvents\Http\Actions\Attendees\Public\CreateAttendeePublicAction;
 use HiEvents\Http\Actions\Auth\AcceptInvitationAction;
 use HiEvents\Http\Actions\Auth\ForgotPasswordAction;
 use HiEvents\Http\Actions\Auth\GetUserInvitationAction;
@@ -396,6 +397,7 @@ $router->prefix('/public')->group(
         $router->get('/events/{event_id}/order/{order_short_id}/invoice', DownloadOrderInvoicePublicAction::class);
 
         // Attendees
+        $router->post('/events/{event_id}/attendees', CreateAttendeePublicAction::class);
         $router->get('/events/{event_id}/attendees', GetAttendeesListPublicAction::class);
         $router->get('/events/{event_id}/attendees/{attendee_short_id}', GetAttendeeActionPublic::class);
 

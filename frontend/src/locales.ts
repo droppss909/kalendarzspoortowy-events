@@ -8,6 +8,7 @@ export type SupportedLocales =
     | "it"
     | "nl"
     | "pt"
+    | "pl"
     | "es"
     | "zh-cn"
     | "pt-br"
@@ -16,7 +17,7 @@ export type SupportedLocales =
     | "tr"
     | "hu";
 
-export const availableLocales = ["en", "de", "fr", "it", "nl", "pt", "es", "zh-cn", "zh-hk", "pt-br", "vi", "tr", "hu"];
+export const availableLocales = ["en", "de", "fr", "it", "nl", "pt", "pl", "es", "zh-cn", "zh-hk", "pt-br", "vi", "tr", "hu"];
 
 export const localeToFlagEmojiMap: Record<SupportedLocales, string> = {
     en: '🇬🇧',
@@ -25,6 +26,7 @@ export const localeToFlagEmojiMap: Record<SupportedLocales, string> = {
     it: '🇮🇹',
     nl: '🇳🇱',
     pt: '🇵🇹',
+    pl: '🇵🇱',
     es: '🇪🇸',
     "zh-cn": '🇨🇳',
     "zh-hk": '🇭🇰',
@@ -41,6 +43,7 @@ export const localeToNameMap: Record<SupportedLocales, string> = {
     it: `Italian`,
     nl: `Dutch`,
     pt: `Portuguese`,
+    pl: `Polish`,
     es: `Spanish`,
     "zh-cn": `Chinese`,
     "zh-hk": `Cantonese`,
@@ -66,15 +69,15 @@ export const getClientLocale = () => {
             return getSupportedLocale(storedLocale);
         }
 
-        return getSupportedLocale(window.navigator.language);
+        return getSupportedLocale(window.navigator.language ?? "pl");
     }
 
-    return "en";
+    return "pl";
 };
 
 export async function dynamicActivateLocale(locale: string) {
     try {
-        locale = availableLocales.includes(locale) ? locale : "en";
+        locale = availableLocales.includes(locale) ? locale : "pl";
         const module = (await import(`./locales/${locale}.po`));
         i18n.load(locale, module.messages);
         i18n.activate(locale);
@@ -97,5 +100,5 @@ export const getSupportedLocale = (userLocale: string) => {
         return mainLocale;
     }
 
-    return "en";
+    return "pl";
 };

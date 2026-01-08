@@ -19,6 +19,14 @@ class CreateAttendeeRequest extends BaseRequest
                 $this->merge(['birth_date' => $user->birth_date]);
             }
         }
+
+        if (Auth::check() && (!$this->has('gender') || $this->input('gender') === '')) {
+            $user = Auth::user();
+
+            if ($user !== null && $user->gender !== null && $user->gender !== '') {
+                $this->merge(['gender' => $user->gender]);
+            }
+        }
     }
 
     public function rules(): array
@@ -33,6 +41,7 @@ class CreateAttendeeRequest extends BaseRequest
             'last_name' => ['string', 'max:40', 'nullable'],
             'birth_date' => ['required', 'date'],
             'age_category' => ['nullable', 'string', 'max:10'],
+            'gender' => $isAuthenticated ? ['nullable', 'string', 'max:1', 'in:M,F'] : ['required', 'string', 'max:1', 'in:M,F'],
             'club_name' => ['required', 'string', 'max:150'],
             'amount_paid' => ['required', ...RulesHelper::MONEY],
             'send_confirmation_email' => ['required', 'boolean'],

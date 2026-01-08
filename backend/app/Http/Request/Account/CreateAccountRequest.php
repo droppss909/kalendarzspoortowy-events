@@ -21,6 +21,7 @@ class CreateAccountRequest extends BaseRequest
             'last_name' => RulesHelper::STRING,
             'email' => RulesHelper::REQUIRED_EMAIL,
             'birth_date' => ['required', 'date'],
+            'gender' => ['required', 'string', 'max:20'],
             'password' => ['required', 'confirmed', Password::min(8)],
             'timezone' => ['timezone:all'],
             'currency_code' => [Rule::in(array_values($currencies))],

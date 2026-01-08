@@ -130,7 +130,7 @@ const AuthLayout = () => {
                 <div className={classes.leftPanel}>
                     <main className={classes.container}>
                         <div className={classes.logo}>
-                            <img src={getConfig("VITE_APP_LOGO_DARK", "/logo-dark.svg")} alt={t`${getConfig("VITE_APP_NAME", "Hi.Events")} logo`}/>
+                            <img src={getConfig("VITE_APP_LOGO_DARK", "/Logo strefa pomiaru czasu czarne.png")} alt={t`${getConfig("VITE_APP_NAME", "Kalendarz Sportowy")} logo`}/>
                         </div>
                         <div className={classes.wrapper}>
                             <Outlet/>
@@ -149,22 +149,33 @@ const AuthLayout = () => {
                                 * If you wish to remove this notice, a commercial license is available at: https://hi.events/licensing
                                 */
                             }
-                            {!isHiEvents() && <PoweredByFooter/>}
+                            {/* {!isHiEvents() && <PoweredByFooter/>} */}
                             <div className={classes.languageSwitcher}>
                                 <LanguageSwitcher/>
                             </div>
+                            
                         </div>
+                        
                     </main>
+                    <div className={classes.logohievent}>{!isHiEvents() && <PoweredByFooter/>}</div>
                 </div>
 
                 <div className={classes.rightPanel}>
                     <div className={classes.overlay}>
+                        <div className={classes.movingTextWrapper}>
+                            <div className={classes.movingText}>
+                                <span className={classes.textPrimary}>Ty jedziesz,</span>{" "}
+                                <span className={classes.textAccent}>My liczymy</span>
+                            </div>
+                        </div>
                         <div className={classes.content}>
                             {isRegisterPage ? <RegisterFeatures/> : <GenericFeatures/>}
                         </div>
                     </div>
                 </div>
+                
             </div>
+            
         </div>
     );
 };

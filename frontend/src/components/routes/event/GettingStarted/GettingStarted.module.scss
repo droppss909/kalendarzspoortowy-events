@@ -1,7 +1,7 @@
 @use "../../../../styles/mixins.scss";
 
 .headerCard {
-  background: linear-gradient(135deg, #f8f9ff 0%, #eee5ff 100%);
+  background: linear-gradient(135deg, #e0f2ff 0%, #dbeafe 100%);
   border-radius: 16px;
   box-shadow: 0 8px 24px rgba(149, 157, 165, 0.08) !important;
   padding: 32px;
@@ -72,7 +72,7 @@
 }
 
 .confettiIcon {
-  color: #8a6eff;
+  color: #2563eb;
   animation: pulse 2s infinite ease-in-out;
 }
 
@@ -107,11 +107,11 @@
 
 .progressBar {
   height: 8px;
-  background-color: rgba(138, 110, 255, 0.1);
+  background-color: rgba(37, 99, 235, 0.1);
 
   [role="progressbar"] {
-    background: linear-gradient(90deg, #8a6eff, #b57aff);
-    box-shadow: 0 0 8px rgba(138, 110, 255, 0.4);
+    background: linear-gradient(90deg, #2563eb, #38bdf8);
+    box-shadow: 0 0 8px rgba(37, 99, 235, 0.4);
     transition: width 0.5s ease-in-out;
   }
 }

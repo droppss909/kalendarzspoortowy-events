@@ -20,6 +20,7 @@ class CreateAttendeeDTO extends BaseDTO
         public readonly string      $locale,
         public readonly ?string     $birth_date = null,
         public readonly ?string     $age_category = null,
+        public readonly ?string     $gender = null,
         public readonly ?bool       $amount_includes_tax = false,
         public readonly ?int        $product_price_id = null,
         #[CollectionOf(CreateAttendeeTaxAndFeeDTO::class)]

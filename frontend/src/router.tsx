@@ -11,7 +11,7 @@ const Root = () => {
 
     useEffect(() => {
         if (me.isFetched) {
-            setRedirectPath(me.isSuccess ? "/manage/events" : "/auth/login");
+            setRedirectPath(me.isSuccess ? "/manage/user/dashboard" : "/auth/login");
         }
     }, [me.isFetched]);
 
@@ -186,6 +186,48 @@ export const router: RouteObject[] = [
                 ]
             },
         ]
+    },
+    {
+        path: "/manage/user",
+        async lazy() {
+            const UserLayout = await import("./components/layouts/UserLayout");
+            return {Component: UserLayout.default};
+        },
+        errorElement: <ErrorPage/>,
+        children: [
+            {
+                path: "",
+                element: <Navigate to="dashboard" replace={true}/>,
+            },
+            {
+                path: "dashboard",
+                async lazy() {
+                    const UserDashboard = await import("./components/routes/user/UserDashboard");
+                    return {Component: UserDashboard.default};
+                },
+            },
+            {
+                path: "favorites",
+                async lazy() {
+                    const UserFavorites = await import("./components/routes/user/UserFavorites");
+                    return {Component: UserFavorites.default};
+                },
+            },
+            {
+                path: "nearby",
+                async lazy() {
+                    const UserNearby = await import("./components/routes/user/UserNearby");
+                    return {Component: UserNearby.default};
+                },
+            },
+            {
+                path: "history",
+                async lazy() {
+                    const UserHistory = await import("./components/routes/user/UserHistory");
+                    return {Component: UserHistory.default};
+                },
+            },
+        ],
     },
     {
         path: "/manage/organizer/:organizerId?",
@@ -505,4 +547,3 @@ export const router: RouteObject[] = [
         errorElement: <ErrorPage/>,
     }
 ];
-
