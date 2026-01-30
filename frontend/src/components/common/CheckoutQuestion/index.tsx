@@ -195,12 +195,12 @@ export const QuestionInput = ({question, name, form}: QuestionInputProps) => {
         case QuestionType.DROPDOWN:
             input = <DropDownInput question={question} name={name} form={form}/>;
             break;
-        case QuestionType.SINGLE_LINE_TEXT:
-            input = <SingleLineTextInput question={question} name={name} form={form}/>;
-            break;
-        case QuestionType.DATE:
-            input = <DateInput question={question} name={name} form={form}/>;
-            break;
+        // case QuestionType.SINGLE_LINE_TEXT:
+        //     input = <SingleLineTextInput question={question} name={name} form={form}/>;
+        //     break;
+        // case QuestionType.DATE:
+        //     input = <DateInput question={question} name={name} form={form}/>;
+        //     break;
     }
 
     return (

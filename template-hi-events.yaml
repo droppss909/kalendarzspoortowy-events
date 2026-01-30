@@ -1,0 +1,394 @@
+﻿kind: Template
+apiVersion: template.openshift.io/v1
+metadata:
+  name: hi-events
+  namespace: mdropiewski-kalendarzsportowy-devel
+  uid: e8a6466e-266b-4fd0-b83c-b79b1e4f4333
+  resourceVersion: '470003288'
+  creationTimestamp: '2026-01-29T22:05:21Z'
+  managedFields:
+    - manager: Mozilla
+      operation: Update
+      apiVersion: template.openshift.io/v1
+      time: '2026-01-29T22:05:21Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:objects': {}
+        'f:parameters': {}
+objects:
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: postgres-secret
+    type: Opaque
+    stringData:
+      POSTGRES_DB: '${POSTGRES_DB}'
+      POSTGRES_USER: '${POSTGRES_USER}'
+      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD}'
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: app-secret
+    type: Opaque
+    stringData:
+      APP_KEY: 'base64:${LARAVEL_APP_KEY_B64}'
+      JWT_SECRET: '${JWT_SECRET}'
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: pgdata
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+      storageClassName: '${STORAGE_CLASS_NAME}'
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: postgres
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: postgres
+      template:
+        metadata:
+          labels:
+            app: postgres
+        spec:
+          containers:
+            - name: postgres
+              image: 'registry.paas.psnc.pl/base/postgres:lastes'
+              ports:
+                - containerPort: 5432
+              env:
+                - name: POSTGRES_DB
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-secret
+                      key: POSTGRES_DB
+                - name: POSTGRES_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-secret
+                      key: POSTGRES_USER
+                - name: POSTGRES_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-secret
+                      key: POSTGRES_PASSWORD
+              volumeMounts:
+                - name: pgdata
+                  mountPath: /var/lib/postgresql/data
+              readinessProbe:
+                exec:
+                  command:
+                    - sh
+                    - '-c'
+                    - pg_isready -U $POSTGRES_USER
+                initialDelaySeconds: 10
+                periodSeconds: 10
+              livenessProbe:
+                exec:
+                  command:
+                    - sh
+                    - '-c'
+                    - pg_isready -U $POSTGRES_USER
+                initialDelaySeconds: 30
+                periodSeconds: 10
+          volumes:
+            - name: pgdata
+              persistentVolumeClaim:
+                claimName: pgdata
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: postgres
+    spec:
+      selector:
+        app: postgres
+      ports:
+        - name: pg
+          port: 5432
+          targetPort: 5432
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: redisdata
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 20Gi
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: redis
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: redis
+      template:
+        metadata:
+          labels:
+            app: redis
+        spec:
+          containers:
+            - name: redis
+              image: 'registry.paas.psnc.pl/base/redis:lastest'
+              ports:
+                - containerPort: 6379
+              args:
+                - '--appendonly'
+                - 'yes'
+              volumeMounts:
+                - name: redisdata
+                  mountPath: /data
+              readinessProbe:
+                exec:
+                  command:
+                    - sh
+                    - '-c'
+                    - redis-cli ping | grep PONG
+                initialDelaySeconds: 5
+                periodSeconds: 10
+              livenessProbe:
+                exec:
+                  command:
+                    - sh
+                    - '-c'
+                    - redis-cli ping | grep PONG
+                initialDelaySeconds: 15
+                periodSeconds: 10
+          volumes:
+            - name: redisdata
+              persistentVolumeClaim:
+                claimName: redisdata
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: redis
+    spec:
+      selector:
+        app: redis
+      ports:
+        - name: redis
+          port: 6379
+          targetPort: 6379
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: hi-events-backend
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: hi-events-backend
+      template:
+        metadata:
+          labels:
+            app: hi-events-backend
+        spec:
+          imagePullSecrets:
+            - name: dockerhub-pull
+          containers:
+            - name: backend
+              image: 'droppss/platforma-kalendarz:backend'
+              ports:
+                - containerPort: 8080
+              env:
+                - name: APP_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: app-secret
+                      key: APP_KEY
+                - name: JWT_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: app-secret
+                      key: JWT_SECRET
+                - name: LOG_CHANNEL
+                  value: stderr
+                - name: APP_FRONTEND_URL
+                  value: 'http://hi-events-frontend'
+                - name: APP_CDN_URL
+                  value: 'http://hi-events-frontend/storage'
+                - name: APP_SAAS_MODE_ENABLED
+                  value: 'false'
+                - name: APP_DISABLE_REGISTRATION
+                  value: 'true'
+                - name: QUEUE_CONNECTION
+                  value: redis
+                - name: REDIS_HOST
+                  value: redis
+                - name: REDIS_PORT
+                  value: '6379'
+                - name: REDIS_PASSWORD
+                  value: ''
+                - name: DB_CONNECTION
+                  value: pgsql
+                - name: DB_HOST
+                  value: postgres
+                - name: DB_PORT
+                  value: '5432'
+                - name: DB_DATABASE
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-secret
+                      key: POSTGRES_DB
+                - name: DB_USERNAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-secret
+                      key: POSTGRES_USER
+                - name: DB_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-secret
+                      key: POSTGRES_PASSWORD
+                - name: DATABASE_URL
+                  value: 'postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}'
+                - name: FILESYSTEM_DISK
+                  value: public
+                - name: STRIPE_PUBLIC_KEY
+                  value: pk_test_123456789
+                - name: STRIPE_SECRET_KEY
+                  value: sk_test_123456789
+                - name: STRIPE_WEBHOOK_SECRET
+                  value: whsec_test_123456789
+                - name: MAIL_MAILER
+                  value: log
+              readinessProbe:
+                httpGet:
+                  path: /api/health
+                  port: 8080
+                initialDelaySeconds: 15
+                periodSeconds: 10
+              livenessProbe:
+                httpGet:
+                  path: /api/health
+                  port: 8080
+                initialDelaySeconds: 45
+                periodSeconds: 20
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: hi-events-backend
+    spec:
+      selector:
+        app: hi-events-backend
+      ports:
+        - name: http
+          port: 8080
+          targetPort: 8080
+  - apiVersion: route.openshift.io/v1
+    kind: Route
+    metadata:
+      name: hi-events-backend
+    spec:
+      to:
+        kind: Service
+        name: hi-events-backend
+      port:
+        targetPort: http
+      tls:
+        termination: edge
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: hi-events-frontend
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: hi-events-frontend
+      template:
+        metadata:
+          labels:
+            app: hi-events-frontend
+        spec:
+          imagePullSecrets:
+            - name: dockerhub-pull
+          containers:
+            - name: frontend
+              image: 'droppss/platforma-kalendarz:frontend'
+              ports:
+                - containerPort: 5678
+              env:
+                - name: VITE_FRONTEND_URL
+                  value: 'https://hi-events-frontend'
+                - name: VITE_API_URL_CLIENT
+                  value: 'https://hi-events-backend/api'
+                - name: VITE_API_URL_SERVER
+                  value: 'http://hi-events-backend:8080/api'
+                - name: VITE_STRIPE_PUBLISHABLE_KEY
+                  value: pk_test_123456789
+                - name: VITE_APP_NAME
+                  value: Hi.Events
+              readinessProbe:
+                httpGet:
+                  path: /
+                  port: 5678
+                initialDelaySeconds: 10
+                periodSeconds: 10
+              livenessProbe:
+                httpGet:
+                  path: /
+                  port: 5678
+                initialDelaySeconds: 30
+                periodSeconds: 20
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: hi-events-frontend
+    spec:
+      selector:
+        app: hi-events-frontend
+      ports:
+        - name: http
+          port: 80
+          targetPort: 5678
+  - apiVersion: route.openshift.io/v1
+    kind: Route
+    metadata:
+      name: hi-events-frontend
+    spec:
+      to:
+        kind: Service
+        name: hi-events-frontend
+      port:
+        targetPort: http
+      tls:
+        termination: edge
+parameters:
+  - name: APP_NAME
+    value: hi-events
+  - name: BACKEND_IMAGE
+    description: 'Image reference for backend (e.g. image-registry.openshift-image-registry.svc:5000/ns/hi-events-backend:latest)'
+    required: true
+  - name: FRONTEND_IMAGE
+    description: 'Image reference for frontend (e.g. image-registry.openshift-image-registry.svc:5000/ns/hi-events-frontend:latest)'
+    required: true
+  - name: POSTGRES_IMAGE
+    value: 'postgres:16-alpine'
+  - name: REDIS_IMAGE
+    value: 'redis:7-alpine'
+  - name: POSTGRES_DB
+    value: hi-events
+  - name: POSTGRES_USER
+    value: postgres
+  - name: POSTGRES_PASSWORD
+    generate: expression
+    from: '[a-zA-Z0-9]{32}'
+  - name: JWT_SECRET
+    generate: expression
+    from: '[a-zA-Z0-9+/=]{48}'
+  - name: LARAVEL_APP_KEY_B64
+    generate: expression
+    from: '[a-zA-Z0-9+/=]{44}'
+  - name: STORAGE_CLASS_NAME
+    description: 'Optional: set storageClassName for PVCs. Leave empty to use cluster default.'

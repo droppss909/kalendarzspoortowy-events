@@ -1,4 +1,5 @@
 import {EventInformation} from "./EventInformation";
+import {Navigate} from "react-router";
 import classes from "./EventHomepage.module.scss";
 import SelectProducts from "../../routes/product-widget/SelectProducts";
 import "../../../styles/widget/default.scss";
@@ -16,6 +17,7 @@ import {socialMediaConfig} from "../../../constants/socialMediaConfig";
 import {getGoogleMapsUrl, getShortLocationDisplay} from "../../../utilites/addressUtilities.ts";
 import {StatusToggle} from "../../common/StatusToggle";
 import {getConfig} from "../../../utilites/config.ts";
+import {getCustomEventLandingPath} from "../../../constants/customEventLandingPages";
 
 interface EventHomepageProps {
     colors?: {
@@ -97,6 +99,11 @@ const EventHomepage = ({colors, continueButtonText, backgroundType, ...loaderDat
 
     if (!event) {
         return <EventNotAvailable/>;
+    }
+
+    const customLandingPath = getCustomEventLandingPath(event?.id);
+    if (customLandingPath) {
+        return <Navigate to={customLandingPath} replace={true}/>;
     }
 
     const coverImage = eventCoverImageUrl(event);

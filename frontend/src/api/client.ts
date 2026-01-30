@@ -17,6 +17,7 @@ const ALLOWED_UNAUTHENTICATED_PATHS = [
     'auth',
     'account/payment',
     'checkout',
+    '/l/',
     '/event/',
     'print',
     '/order/',

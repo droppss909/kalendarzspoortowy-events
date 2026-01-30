@@ -138,6 +138,23 @@ class CompleteOrderHandler
             }
 
             $shortId = IdHelper::shortId(IdHelper::ATTENDEE_PREFIX);
+            $birthDate = $attendee->birth_date;
+            $gender = $attendee->gender;
+            $resolvedAgeCategory = $this->resolveAgeCategoryFromTicket(
+                productId: $productId,
+                birthDate: $birthDate,
+                gender: $gender,
+            );
+            $ageCategory = $resolvedAgeCategory;
+
+            if ($gender !== null) {
+                $genderPrefix = strtoupper($gender);
+                if ($ageCategory === null) {
+                    $ageCategory = $genderPrefix;
+                } elseif (!preg_match('/^(M|F)/i', $ageCategory)) {
+                    $ageCategory = $genderPrefix . $ageCategory;
+                }
+            }
 
             $inserts[] = [
                 AttendeeDomainObjectAbstract::EVENT_ID => $order->getEventId(),
@@ -150,10 +167,14 @@ class CompleteOrderHandler
                 AttendeeDomainObjectAbstract::FIRST_NAME => $attendee->first_name,
                 AttendeeDomainObjectAbstract::LAST_NAME => $attendee->last_name,
                 AttendeeDomainObjectAbstract::CLUB_NAME => $attendee->club_name,
+                AttendeeDomainObjectAbstract::BIRTH_DATE => $birthDate,
+                AttendeeDomainObjectAbstract::AGE_CATEGORY => $ageCategory,
                 AttendeeDomainObjectAbstract::ORDER_ID => $order->getId(),
                 AttendeeDomainObjectAbstract::PUBLIC_ID => IdHelper::publicId(IdHelper::ATTENDEE_PREFIX),
                 AttendeeDomainObjectAbstract::SHORT_ID => $shortId,
                 AttendeeDomainObjectAbstract::LOCALE => $order->getLocale(),
+                AttendeeDomainObjectAbstract::USER_ID => $attendee->user_id,
+
             ];
 
             $createdProductData->push(new CreatedProductDataDTO(
@@ -171,6 +192,71 @@ class CompleteOrderHandler
             order: $order,
             productPrices: $productsPrices,
         );
+    }
+
+    private function resolveAgeCategoryFromTicket(int $productId, ?string $birthDate, ?string $gender): ?string
+    {
+        if ($birthDate === null) {
+            return null;
+        }
+
+        $assignment = DB::table('ticket_age_rule_assignment')->where('ticket_id', $productId)->first();
+
+        if ($assignment === null) {
+            return null;
+        }
+
+        $rule = DB::table('age_category_rules')
+            ->where('id', $assignment->rule_id)
+            ->where('is_active', true)
+            ->first();
+
+        if ($rule === null || $rule->calc_mode !== 'BY_AGE') {
+            return null;
+        }
+
+        $ruleData = is_string($rule->rule) ? json_decode($rule->rule, true) : $rule->rule;
+
+        if (!is_array($ruleData) || !isset($ruleData['bins']) || !is_array($ruleData['bins'])) {
+            return null;
+        }
+
+        $age = Carbon::parse($birthDate)->age;
+        $normalizedGender = $gender !== null ? strtoupper($gender) : null;
+
+        foreach ($ruleData['bins'] as $bin) {
+            $min = $bin['min'] ?? null;
+            $max = $bin['max'] ?? null;
+            $ageCategory = $bin['age_category'] ?? null;
+            $binGender = $bin['gender'] ?? null;
+
+            if (!is_numeric($min) || !is_numeric($max) || !is_string($ageCategory)) {
+                continue;
+            }
+
+            $isInRange = $age >= (float)$min && $age <= (float)$max;
+
+            if (!$isInRange) {
+                continue;
+            }
+
+            if (is_string($binGender) && $binGender !== '') {
+                if ($normalizedGender === null) {
+                    continue;
+                }
+                if (strtoupper($binGender) !== $normalizedGender) {
+                    continue;
+                }
+            }
+
+            if ($normalizedGender !== null && !preg_match('/^(M|F)/i', $ageCategory)) {
+                return $normalizedGender . $ageCategory;
+            }
+
+            return $ageCategory;
+        }
+
+        return null;
     }
 
     private function createOrderQuestions(Collection $questions, OrderDomainObject $order): void

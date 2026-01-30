@@ -1,56 +1,60 @@
 services:
-  all-in-one:
-    build:
-      context: ./../../
-      dockerfile: Dockerfile.all-in-one
-    container_name: all-in-one
-    ports:
-      - "8123:80"
-    networks:
-    - hi-events-network
-    environment:
-      - VITE_FRONTEND_URL=${VITE_FRONTEND_URL}
-      - VITE_API_URL_CLIENT=${VITE_API_URL_CLIENT}
-      - VITE_API_URL_SERVER=${VITE_API_URL_SERVER}
-      - VITE_STRIPE_PUBLISHABLE_KEY=${VITE_STRIPE_PUBLISHABLE_KEY}
-      - VITE_APP_NAME=${VITE_APP_NAME}
-      - LOG_CHANNEL=${LOG_CHANNEL}
-      - QUEUE_CONNECTION=${QUEUE_CONNECTION}
-      - APP_KEY=${APP_KEY}
-      - APP_CDN_URL=${APP_CDN_URL}
-      - APP_FRONTEND_URL=${APP_FRONTEND_URL}
-      - JWT_SECRET=${JWT_SECRET}
-      - APP_DISABLE_REGISTRATION=${APP_DISABLE_REGISTRATION}
-      - APP_SAAS_MODE_ENABLED=${APP_SAAS_MODE_ENABLED}
-      - APP_SAAS_STRIPE_APPLICATION_FEE_PERCENT=${APP_SAAS_STRIPE_APPLICATION_FEE_PERCENT}
-      - APP_SAAS_STRIPE_APPLICATION_FEE_FIXED=${APP_SAAS_STRIPE_APPLICATION_FEE_FIXED}
-      - APP_EMAIL_LOGO_URL=${APP_EMAIL_LOGO_URL}
-      - APP_EMAIL_LOGO_LINK_URL=${APP_EMAIL_LOGO_LINK_URL}
-      - MAIL_MAILER=${MAIL_MAILER}
-      - MAIL_DRIVER=${MAIL_DRIVER}
-      - MAIL_HOST=${MAIL_HOST}
-      - MAIL_PORT=${MAIL_PORT}
-      - MAIL_USERNAME=${MAIL_USERNAME}
-      - MAIL_PASSWORD=${MAIL_PASSWORD}
-      - MAIL_ENCRYPTION=${MAIL_ENCRYPTION}
-      - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS}
-      - MAIL_FROM_NAME=${MAIL_FROM_NAME}
-      - FILESYSTEM_PUBLIC_DISK=${FILESYSTEM_PUBLIC_DISK}
-      - FILESYSTEM_PRIVATE_DISK=${FILESYSTEM_PRIVATE_DISK}
-      - DATABASE_URL=postgresql://postgres:secret@postgres:5432/hi-events
-      - REDIS_HOST=redis
-      - REDIS_PASSWORD=
-      - REDIS_PORT=6379
-      - STRIPE_PUBLIC_KEY=${STRIPE_PUBLIC_KEY}
-      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
-      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
-      - WEBHOOK_QUEUE_NAME=webhook-queue
-    depends_on:
-       postgres:
-         condition: service_healthy
-       redis:
-         condition: service_healthy
-
+  #  all-in-one:
+  #    build:
+  #      context: ./../../
+  #      dockerfile: Dockerfile.all-in-one
+  #    container_name: all-in-one
+  #    ports:
+  #      - "8123:80"
+  #      - "24678:24678"
+  #    networks:
+  #    - hi-events-network
+  #    environment:
+  #      - VITE_FRONTEND_URL=${VITE_FRONTEND_URL}
+  #      - VITE_API_URL_CLIENT=${VITE_API_URL_CLIENT}
+  #      - VITE_API_URL_SERVER=${VITE_API_URL_SERVER}
+  #      - VITE_STRIPE_PUBLISHABLE_KEY=${VITE_STRIPE_PUBLISHABLE_KEY}
+  #      - VITE_APP_NAME=${VITE_APP_NAME}
+  #      - LOG_CHANNEL=${LOG_CHANNEL}
+  #      - QUEUE_CONNECTION=${QUEUE_CONNECTION}
+  #      - APP_KEY=${APP_KEY}
+  #      - APP_CDN_URL=${APP_CDN_URL}
+  #      - APP_FRONTEND_URL=${APP_FRONTEND_URL}
+  #      - JWT_SECRET=${JWT_SECRET}
+  #      - APP_DISABLE_REGISTRATION=${APP_DISABLE_REGISTRATION}
+  #      - APP_SAAS_MODE_ENABLED=${APP_SAAS_MODE_ENABLED}
+  #      - APP_SAAS_STRIPE_APPLICATION_FEE_PERCENT=${APP_SAAS_STRIPE_APPLICATION_FEE_PERCENT}
+  #      - APP_SAAS_STRIPE_APPLICATION_FEE_FIXED=${APP_SAAS_STRIPE_APPLICATION_FEE_FIXED}
+  #      - APP_EMAIL_LOGO_URL=${APP_EMAIL_LOGO_URL}
+  #      - APP_EMAIL_LOGO_LINK_URL=${APP_EMAIL_LOGO_LINK_URL}
+  #      - MAIL_MAILER=${MAIL_MAILER}
+  #      - MAIL_DRIVER=${MAIL_DRIVER}
+  #      - MAIL_HOST=${MAIL_HOST}
+  #      - MAIL_PORT=${MAIL_PORT}
+  #      - MAIL_USERNAME=${MAIL_USERNAME}
+  #      - MAIL_PASSWORD=${MAIL_PASSWORD}
+  #      - MAIL_ENCRYPTION=${MAIL_ENCRYPTION}
+  #      - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS}
+  #      - MAIL_FROM_NAME=${MAIL_FROM_NAME}
+  #      - FILESYSTEM_PUBLIC_DISK=${FILESYSTEM_PUBLIC_DISK}
+  #      - FILESYSTEM_PRIVATE_DISK=${FILESYSTEM_PRIVATE_DISK}
+  #      - DATABASE_URL=postgresql://postgres:secret@postgres:5432/hi-events
+  #      - REDIS_HOST=redis
+  #      - REDIS_PASSWORD=
+  #      - REDIS_PORT=6379
+  #      - STRIPE_PUBLIC_KEY=${STRIPE_PUBLIC_KEY}
+  #      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+  #      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+  #      - WEBHOOK_QUEUE_NAME=webhook-queue
+  #    depends_on:
+  #       postgres:
+  #         condition: service_healthy
+  #       redis:
+  #         condition: service_healthy
+  #    volumes:
+  #      - "/home/mdropiewski/projekt kalendarz/hi.events/backend:/app/backend"
+  #      - "/home/mdropiewski/projekt kalendarz/hi.events/frontend:/app/frontend"
+  #      - /app/node_modules      
   redis:
     image: redis:latest
     container_name: redis
@@ -81,16 +85,93 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: secret
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata1:/var/lib/postgresql/data
     ports:
       - 5432:5432
+
+  hi-events-backend:
+    build:
+      context: ./../../backend
+      dockerfile: Dockerfile
+    container_name: hi-events-backend
+    ports:
+      - "8124:8080"
+    networks:
+      - hi-events-network      
+    environment:
+      # Core
+      APP_KEY: "base64:L3oZWDgUeajPmFkf45twiecKPKouG/daIo0+I3HkWM0="
+      JWT_SECRET: "zcC3aoCFD0nu9NlieSjqEKeS3HsFtqyNA6vmjl8+ZE4="
+      LOG_CHANNEL: "stderr"
+    
+      # App URLs
+      APP_FRONTEND_URL: "http://localhost:8123"
+      APP_CDN_URL: "http://localhost:8123/storage"
+    
+      # SaaS
+      APP_SAAS_MODE_ENABLED: "false"
+      APP_DISABLE_REGISTRATION: "true"
+    
+      # Queue / Redis
+      QUEUE_CONNECTION: "redis"
+      REDIS_HOST: "redis"
+      REDIS_PASSWORD: ""
+      REDIS_PORT: "6379"
+      REDIS_USER: ""
+      REDIS_URL: ""
+    
+      # Database
+      DB_CONNECTION: "pgsql"
+      DB_HOST: "postgres"
+      DB_PORT: "5432"
+      DB_DATABASE: "hi-events"
+      DB_USERNAME: "postgres"
+      DB_PASSWORD: "secret"
+      DATABASE_URL: "postgresql://postgres:secret@postgres:5432/hi-events"
+    
+      # Storage (z Twojego .env to były dyski local/public, więc NIE s3)
+      FILESYSTEM_DISK: "public"
+      AWS_ACCESS_KEY_ID: ""
+      AWS_SECRET_ACCESS_KEY: ""
+      AWS_DEFAULT_REGION: "us-west-1"
+      AWS_PUBLIC_BUCKET: ""
+      AWS_PRIVATE_BUCKET: ""
+    
+      # Stripe (test)
+      STRIPE_PUBLIC_KEY: "pk_test_123456789"
+      STRIPE_SECRET_KEY: "sk_test_123456789"
+      STRIPE_WEBHOOK_SECRET: "whsec_test_123456789"
+    
+      # Mail (w Twoim .env jest log)
+      MAIL_MAILER: "log"
+      MAIL_HOST: "mail.local"
+      MAIL_PORT: "1025"
+      MAIL_USERNAME: "null"
+      MAIL_PASSWORD: "null"
+
+  hi-events-frontend:
+    build:
+      context: ./../../frontend
+      dockerfile: Dockerfile.ssr
+    container_name: hi-events-frontend
+    networks:
+      - hi-events-network      
+    ports:
+      - "8125:5678"
+    environment:
+      VITE_FRONTEND_URL: "http://localhost:8125"
+      VITE_API_URL_CLIENT: "http://localhost:8124"
+      VITE_API_URL_SERVER: "http://localhost:8124"
+      VITE_STRIPE_PUBLISHABLE_KEY: "pk_test_123456789"
+      VITE_APP_NAME: "Hi.Events"
+
 
 networks:
   hi-events-network:
     driver: bridge
 
 volumes:
-  pgdata:
+  pgdata1:
     driver: local
   redisdata:
     driver: local

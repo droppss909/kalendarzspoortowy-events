@@ -93,7 +93,9 @@ class ProductQuestionRule extends BaseQuestionRule
             'first_name' => ['required', 'string', 'min:1', 'max:100'],
             'last_name' => ['required', 'string', 'min:1', 'max:100'],
             'email' => ['required', 'string', 'email', 'max:100'],
-            'club_name' => ['required', 'string', 'min:1', 'max:150'],
+            'club_name' => ['nullable', 'string', 'max:150'],
+            'birth_date' => ['required', 'date'],
+            'gender' => ['required', 'string', 'max:1', 'in:M,F'],
         ]);
 
         if ($validator->fails()) {

@@ -199,6 +199,14 @@
     margin-top: 20px;
     flex-direction: column;
 
+    .hi-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
     .hi-product-page-message {
       margin-bottom: 20px;
       padding: 10px 20px;
@@ -212,4 +220,3 @@
     }
   }
 }
-

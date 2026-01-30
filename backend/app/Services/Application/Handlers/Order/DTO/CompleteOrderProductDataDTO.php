@@ -18,6 +18,10 @@ class CompleteOrderProductDataDTO extends BaseDTO
         public readonly ?string     $last_name = null,
         public readonly ?string     $email = null,
         public readonly ?string     $club_name = null,
+        public readonly ?string     $birth_date = null,
+        public readonly ?string     $gender = null,
+        public readonly ?int $user_id = null,
+
     )
     {
     }

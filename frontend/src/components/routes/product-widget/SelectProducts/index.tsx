@@ -36,6 +36,8 @@ import {promoCodeClientPublic} from "../../../../api/promo-code.client.ts";
 import {IconChevronRight, IconX} from "@tabler/icons-react"
 import {getSessionIdentifier} from "../../../../utilites/sessionIdentifier.ts";
 import {Constants} from "../../../../constants.ts";
+import {formatCurrency} from "../../../../utilites/currency.ts";
+import {useGetMe} from "../../../../queries/useGetMe.ts";
 
 const AFFILIATE_EXPIRY_DAYS = 30;
 
@@ -75,17 +77,23 @@ interface SelectProductsProps {
     continueButtonText?: string;
     widgetMode?: 'preview' | 'normal' | 'embedded';
     showPoweredBy?: boolean;
+    showLoginPrompt?: boolean;
 }
 
 const SelectProducts = (props: SelectProductsProps) => {
     const {eventId} = useParams();
+    const resolvedEventId = eventId ?? String(props.event.id ?? "");
     const queryClient = useQueryClient();
     const navigate = useNavigate();
+    const meQuery = useGetMe();
 
     const promoRef = useRef<HTMLInputElement>(null);
     const [showPromoCodeInput, setShowPromoCodeInput] = useInputState<boolean>(false);
     const [event, setEvent] = useState(props.event);
     const [orderInProcessOverlayVisible, setOrderInProcessOverlayVisible] = useState(false);
+    const [loginPromptOpen, setLoginPromptOpen] = useState(false);
+    const [pendingSelection, setPendingSelection] = useState<Omit<ProductFormPayload, "session_identifier"> | null>(null);
+    const [redirectToLoginAfterCreate, setRedirectToLoginAfterCreate] = useState(false);
     const [resizeRef, resizeObserverRect] = useResizeObserver();
     const [collapsedProducts, setCollapsedProducts] = useState<{ [key: number]: boolean }>({});
     const [affiliateCode, setAffiliateCode] = useState<string | null>(null);
@@ -93,7 +101,7 @@ const SelectProducts = (props: SelectProductsProps) => {
     useEffect(() => sendHeightToIframeWidgets(), [resizeObserverRect.height]);
 
     useEffect(() => {
-        const storageKey = 'affiliate_code_' + eventId;
+        const storageKey = 'affiliate_code_' + resolvedEventId;
 
         const now = Date.now();
         const affiliateCodeFromUrl = new URLSearchParams(window.location.search).get('aff');
@@ -135,14 +143,22 @@ const SelectProducts = (props: SelectProductsProps) => {
     });
 
     const productMutation = useMutation({
-        mutationFn: (orderData: ProductFormPayload) => orderClientPublic.create(Number(eventId), orderData),
+        mutationFn: (orderData: ProductFormPayload) => orderClientPublic.create(Number(resolvedEventId), orderData),
 
         onSuccess: (data) => queryClient.invalidateQueries()
             .then(() => {
-                const url = '/checkout/' + eventId + '/' + data.data.short_id + '/details';
+                const url = '/checkout/' + resolvedEventId + '/' + data.data.short_id + '/details';
+                const urlWithSession = url + '?session_identifier=' + data.data.session_identifier;
+
+                if (redirectToLoginAfterCreate) {
+                    window?.localStorage?.setItem('previous_url', urlWithSession);
+                    window.location.href = '/auth/login';
+                    return;
+                }
+
                 if (props.widgetMode === 'embedded') {
                     window.open(
-                        url + '?session_identifier=' + data.data.session_identifier + '&utm_source=embedded_widget',
+                        urlWithSession + '&utm_source=embedded_widget',
                         '_blank'
                     );
                     setOrderInProcessOverlayVisible(true);
@@ -168,7 +184,7 @@ const SelectProducts = (props: SelectProductsProps) => {
         mutationFn: async (promoCode: string | null) => {
             if (promoCode) {
                 const validPromoCode = await promoCodeClientPublic.validateCode(
-                    eventId,
+                    resolvedEventId,
                     promoCode
                 );
 
@@ -179,7 +195,7 @@ const SelectProducts = (props: SelectProductsProps) => {
             }
 
             const eventWithPromoCodeApplied = await eventsClientPublic.findByID(
-                eventId,
+                resolvedEventId,
                 promoCode
             );
 
@@ -209,6 +225,56 @@ const SelectProducts = (props: SelectProductsProps) => {
 
         return total;
     }, [form.values.products]);
+
+    const totalCost = useMemo(() => {
+        if (!event) {
+            return 0;
+        }
+
+        const displayMode = event.settings?.price_display_mode;
+        const productsById = new Map<number, Product>();
+        products.forEach((product) => {
+            if (product.id) {
+                productsById.set(Number(product.id), product);
+            }
+        });
+
+        let total = 0;
+        form.values.products?.forEach((productValue) => {
+            const product = productsById.get(Number(productValue.product_id));
+            if (!product) {
+                return;
+            }
+
+            productValue.quantities?.forEach((quantityValue) => {
+                const qty = Number(quantityValue.quantity);
+                if (!qty) {
+                    return;
+                }
+
+                let unitPrice = 0;
+                if (product.type === 'DONATION') {
+                    unitPrice = Number(quantityValue.price || 0);
+                } else {
+                    const priceTier = product.prices?.find((price) => Number(price.id) === Number(quantityValue.price_id));
+                    if (!priceTier) {
+                        return;
+                    }
+                    const basePrice = Number(priceTier.price || 0);
+                    const taxAndFees = Number(priceTier.tax_total || 0) + Number(priceTier.fee_total || 0);
+                    if (displayMode === 'INCLUSIVE') {
+                        unitPrice = Number(priceTier.price_including_taxes_and_fees ?? (basePrice + taxAndFees));
+                    } else {
+                        unitPrice = basePrice;
+                    }
+                }
+
+                total += unitPrice * qty;
+            });
+        });
+
+        return total;
+    }, [event, form.values.products, products]);
 
     useEffect(() => {
         if (form.values.promo_code) {
@@ -267,6 +333,11 @@ const SelectProducts = (props: SelectProductsProps) => {
 
     const handleProductSelection = (values: Omit<ProductFormPayload, "session_identifier">) => {
         if (values && selectedProductQuantitySum > 0) {
+            if (props.showLoginPrompt && meQuery.isFetched && !meQuery.isSuccess) {
+                setPendingSelection(values);
+                setLoginPromptOpen(true);
+                return;
+            }
             productMutation.mutate({
                 ...values,
                 session_identifier: getSessionIdentifier()
@@ -274,6 +345,32 @@ const SelectProducts = (props: SelectProductsProps) => {
         } else {
             showInfo(t`Please select at least one product`);
         }
+    };
+
+    const continueAsGuest = () => {
+        if (!pendingSelection) {
+            setLoginPromptOpen(false);
+            return;
+        }
+        setRedirectToLoginAfterCreate(false);
+        setLoginPromptOpen(false);
+        productMutation.mutate({
+            ...pendingSelection,
+            session_identifier: getSessionIdentifier()
+        });
+    };
+
+    const startLoginFlow = () => {
+        if (!pendingSelection) {
+            setLoginPromptOpen(false);
+            return;
+        }
+        setRedirectToLoginAfterCreate(true);
+        setLoginPromptOpen(false);
+        productMutation.mutate({
+            ...pendingSelection,
+            session_identifier: getSessionIdentifier()
+        });
     };
 
     const handleApplyPromoCode = () => {
@@ -355,7 +452,7 @@ const SelectProducts = (props: SelectProductsProps) => {
 
                             <Button
                                 component="a"
-                                href={'/checkout/' + eventId + '/' + productMutation.data?.data.short_id + '/details' + '?session_identifier=' + productMutation.data?.data.session_identifier}
+                                href={'/checkout/' + resolvedEventId + '/' + productMutation.data?.data.short_id + '/details' + '?session_identifier=' + productMutation.data?.data.session_identifier}
                                 target={'_blank'}
                                 rel={'noopener noreferrer'}
                                 fullWidth
@@ -392,6 +489,28 @@ const SelectProducts = (props: SelectProductsProps) => {
                                 {t`Dismiss this message`}
                             </Button>
                         </div>
+                    </div>
+                </Modal>
+            )}
+            {loginPromptOpen && (
+                <Modal
+                    opened={true}
+                    onClose={() => setLoginPromptOpen(false)}
+                    title={t`Continue`}
+                    centered
+                >
+                    <div style={{display: 'flex', flexDirection: 'column', gap: '12px'}}>
+                        <p style={{margin: 0}}>
+                            {t`You can log in to speed up checkout, or continue without logging in.`}
+                        </p>
+                        <Button
+                            onClick={startLoginFlow}
+                        >
+                            {t`Log in`}
+                        </Button>
+                        <Button variant="outline" onClick={continueAsGuest}>
+                            {t`Continue without login`}
+                        </Button>
                     </div>
                 </Modal>
             )}
@@ -528,6 +647,10 @@ const SelectProducts = (props: SelectProductsProps) => {
                                 __html: event.settings.product_page_message.replace(/\n/g, '<br/>')
                             }} className={'hi-product-page-message'}/>
                         )}
+                        <div className={'hi-total-row'}>
+                            <span>{t`Total`}</span>
+                            <strong>{formatCurrency(totalCost, event?.currency)}</strong>
+                        </div>
                         <Button disabled={isButtonDisabled} fullWidth className={'hi-continue-button'}
                                 type={"submit"}
                                 loading={productMutation.isPending}>

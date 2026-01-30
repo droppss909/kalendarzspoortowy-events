@@ -3,6 +3,7 @@ import {Button, Group, Skeleton} from '@mantine/core';
 import {NavLink} from 'react-router';
 import {IconAlertTriangle, IconCalendar, IconChevronRight, IconFlag, IconUserCircle} from '@tabler/icons-react';
 import {t, Trans} from '@lingui/macro';
+import dayjs from 'dayjs';
 
 import {PageTitle} from '../../../common/PageTitle';
 import {PageBody} from '../../../common/PageBody';
@@ -13,7 +14,7 @@ import {useGetPublicEvents} from '../../../../queries/useGetPublicEvents.ts';
 import {useGetUserEvents} from '../../../../queries/useGetUserEvents.ts';
 import {Event, QueryFilters} from '../../../../types.ts';
 import {formatNumber} from '../../../../utilites/helpers.ts';
-import {dateToBrowserTz, formatDate, isDateInFuture} from '../../../../utilites/dates.ts';
+import {formatDate, isDateInFuture} from '../../../../utilites/dates.ts';
 import {eventHomepagePath} from '../../../../utilites/urlHelper.ts';
 import {EventCard as PublicEventCard} from '../../../layouts/OrganizerHomepage/EventCard';
 import classes from './UserDashboard.module.scss';
@@ -60,8 +61,26 @@ export const UserDashboard = () => {
         })[0];
     }, [registeredEvents]);
 
+    const formatTimeUntil = (startDate: string) => {
+        const diffMs = dayjs.utc(startDate).diff(dayjs());
+        if (diffMs <= 0) {
+            return t`Started`;
+        }
+
+        const totalMinutes = Math.floor(diffMs / 60000);
+        const days = Math.floor(totalMinutes / (60 * 24));
+        const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
+        const minutes = totalMinutes % 60;
+
+        const parts = [];
+        if (days > 0) parts.push(`${days}d`);
+        if (hours > 0 || days > 0) parts.push(`${hours}h`);
+        parts.push(`${minutes}m`);
+        return parts.join(' ');
+    };
+
     const nextEventDisplay = nextEvent
-        ? dateToBrowserTz(nextEvent.start_date, me?.timezone || 'UTC')
+        ? formatTimeUntil(nextEvent.start_date)
         : t`No upcoming races`;
 
     const registeredCount = statsMeta?.total_events ?? registeredEvents.length;
@@ -148,7 +167,7 @@ export const UserDashboard = () => {
                 </div>
                 {registeredEvents.length > 0 ? (
                     <div className={classes.cardsGrid}>
-                        {registeredEvents.slice(0, 3).map((event: Event) => (
+                        {registeredEvents.map((event: Event) => (
                             <PublicEventCard key={event.id || event.slug} event={event}/>
                         ))}
                     </div>

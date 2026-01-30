@@ -5,9 +5,10 @@ services:
       dockerfile: Dockerfile.ssr
     container_name: hi-events-frontend
     ports:
-      - "8125:80"
+      - "8125:5678"
     environment:
-      VITE_STRIPE_PUBLISHABLE_KEY: ""
-      VITE_API_URL_SERVER: "http://localhost/api"
-      VITE_API_URL_CLIENT: "https://app.hi.events/api"
-      VITE_FRONTEND_URL: "https://app.hi.events"
+      VITE_FRONTEND_URL: "http://localhost:8125"
+      VITE_API_URL_CLIENT: "http://localhost:8124"
+      VITE_API_URL_SERVER: "http://localhost:8124"
+      VITE_STRIPE_PUBLISHABLE_KEY: "pk_test_123456789"
+      VITE_APP_NAME: "Hi.Events"

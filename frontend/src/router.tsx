@@ -4,6 +4,7 @@ import {useEffect, useState} from "react";
 import {useGetMe} from "./queries/useGetMe.ts";
 import {publicEventRouteLoader} from "./routeLoaders/publicEventRouteLoader.ts";
 import {publicOrganizerRouteLoader} from "./routeLoaders/publicOrganizerRouteLoader.ts";
+import {eventLanding26RouteLoader} from "./routeLoaders/eventLanding26RouteLoader.ts";
 
 const Root = () => {
     const [redirectPath, setRedirectPath] = useState<string | null>(null);
@@ -425,6 +426,33 @@ export const router: RouteObject[] = [
         async lazy() {
             const PublicOrganizer = await import("./components/layouts/PublicOrganizer");
             return {Component: PublicOrganizer.default};
+        },
+        errorElement: <ErrorPage/>,
+    },
+    {
+        path: "/l/korba",
+        loader: eventLanding26RouteLoader,
+        async lazy() {
+            const EventLanding26 = await import("./pages/l/korba");
+            return {Component: EventLanding26.default};
+        },
+        errorElement: <ErrorPage/>,
+    },
+    {
+        path: "/l/korba/zapisy",
+        loader: eventLanding26RouteLoader,
+        async lazy() {
+            const KorbaTickets = await import("./pages/l/korba-tickets");
+            return {Component: KorbaTickets.default};
+        },
+        errorElement: <ErrorPage/>,
+    },
+    {
+        path: "/l/korba/trasa",
+        loader: eventLanding26RouteLoader,
+        async lazy() {
+            const KorbaRaceRoute = await import("./pages/l/korba-trasa");
+            return {Component: KorbaRaceRoute.default};
         },
         errorElement: <ErrorPage/>,
     },

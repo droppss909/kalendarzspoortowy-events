@@ -6,6 +6,7 @@ import {authClient} from "../../../../api/auth.client.ts";
 import {LoginData, LoginResponse} from "../../../../types.ts";
 import {useForm} from "@mantine/form";
 import {redirectToPreviousUrl} from "../../../../api/client.ts";
+import {setAuthToken} from "../../../../utilites/apiClient.ts";
 import classes from "./Login.module.scss";
 import {t, Trans} from "@lingui/macro";
 import {useEffect, useState} from "react";
@@ -26,6 +27,8 @@ const Login = () => {
 
         onSuccess: (response: LoginResponse) => {
             if (response.token) {
+                localStorage.setItem("token", response.token);
+                setAuthToken(response.token);
                 redirectToPreviousUrl();
                 return;
             }

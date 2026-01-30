@@ -9,6 +9,7 @@ import {useDisclosure} from "@mantine/hooks";
 import {AboutModal} from "../../modals/AboutModal";
 import {getConfig} from "../../../utilites/config.ts";
 import {CreateOrganizerModal} from "../../modals/CreateOrganizerModal";
+import {setAuthToken} from "../../../utilites/apiClient.ts";
 
 interface Link {
     label: string;
@@ -72,6 +73,7 @@ export const GlobalMenu = () => {
             event.preventDefault();
             await authClient.logout();
             localStorage.removeItem("token");
+            setAuthToken(null);
             window.location.href = "/auth/login";
         },
     });

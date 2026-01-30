@@ -1,15 +1,16 @@
 import {useMutation} from "@tanstack/react-query";
 import {FinaliseOrderPayload, orderClientPublic} from "../../../../api/order.client.ts";
 import {useNavigate, useParams} from "react-router";
-import {Button, Group, NativeSelect, Skeleton, TextInput} from "@mantine/core";
+import {Button, Checkbox, Group, NativeSelect, Select, Skeleton, TextInput} from "@mantine/core";
 import {useForm} from "@mantine/form";
 import {notifications} from "@mantine/notifications";
 import {useGetOrderPublic} from "../../../../queries/useGetOrderPublic.ts";
 import {useGetEventPublic} from "../../../../queries/useGetEventPublic.ts";
 import {useGetEventQuestionsPublic} from "../../../../queries/useGetEventQuestionsPublic.ts";
+import {useGetMe} from "../../../../queries/useGetMe.ts";
 import {CheckoutOrderQuestions, CheckoutProductQuestions} from "../../../common/CheckoutQuestion";
 import {Event, IdParam, Order, Question} from "../../../../types.ts";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import {t} from "@lingui/macro";
 import {InputGroup} from "../../../common/InputGroup";
 import {Card} from "../../../common/Card";
@@ -52,10 +53,29 @@ export const CollectInformation = () => {
         isFetched: isQuestionsFetched,
         isError: isQuestionsError
     } = useGetEventQuestionsPublic(eventId);
-    const productQuestions = questions?.filter(question => question.belongs_to === "PRODUCT");
-    const orderQuestions = questions?.filter(question => question.belongs_to === "ORDER");
+    const {data: me} = useGetMe();
+    const [isProfileDetailsLocked, setIsProfileDetailsLocked] = useState(false);
+    const [profileTicketIndex, setProfileTicketIndex] = useState<number | null>(null);
+    const isGenderQuestion = (title?: string) => {
+        if (!title) {
+            return false;
+        }
+        const normalized = title.toLowerCase();
+        return normalized.includes('plec') || normalized.includes('gender');
+    };
+    const productQuestions = questions?.filter(
+        question => question.belongs_to === "PRODUCT" && !isGenderQuestion(question.title)
+    );
+    const orderQuestions = questions?.filter(
+        question => question.belongs_to === "ORDER" && !isGenderQuestion(question.title)
+    );
     const products = productCategories?.flatMap(category => category.products);
     const requireBillingAddress = event?.settings?.require_billing_address;
+    const today = new Date().toISOString().split('T')[0];
+    const genderOptions = [
+        {value: 'F', label: t`Female`},
+        {value: 'M', label: t`Male`},
+    ];
 
     let productIndex = 0;
 
@@ -74,6 +94,8 @@ export const CollectInformation = () => {
                 last_name: "",
                 club_name: "",
                 email: "",
+                birth_date: "",
+                gender: "",
                 product_price_id: "",
                 product_id: "",
                 questions: {},
@@ -163,6 +185,8 @@ export const CollectInformation = () => {
                     last_name: "",
                     club_name: "",
                     email: "",
+                    birth_date: "",
+                    gender: "",
                     questions: productIdToQuestionMap.get(orderItem?.product_id)?.map((question: Question) => {
                         return {
                             question_id: question.id,
@@ -175,6 +199,68 @@ export const CollectInformation = () => {
 
         return products;
     }
+
+    const fillFromProfile = () => {
+        if (!me) {
+            return;
+        }
+
+        form.setFieldValue("order.first_name", me.first_name || "");
+        form.setFieldValue("order.last_name", me.last_name || "");
+        form.setFieldValue("order.email", me.email || "");
+
+        const firstTicketProductId = products?.find(product => product?.product_type === 'TICKET')?.id;
+        if (!firstTicketProductId) {
+            return;
+        }
+
+        const firstTicketIndex = form.values.products.findIndex(
+            product => product.product_id === firstTicketProductId
+        );
+        if (firstTicketIndex === -1) {
+            return;
+        }
+
+        form.setFieldValue(`products.${firstTicketIndex}.first_name`, me.first_name || "");
+        form.setFieldValue(`products.${firstTicketIndex}.last_name`, me.last_name || "");
+        form.setFieldValue(`products.${firstTicketIndex}.email`, me.email || "");
+        form.setFieldValue(`products.${firstTicketIndex}.birth_date`, me.birth_date || "");
+        form.setFieldValue(`products.${firstTicketIndex}.gender`, normalizeGender(me.gender));
+    };
+
+    const fillTicketFromProfile = (ticketIndex: number) => {
+        if (!me) {
+            return;
+        }
+
+        form.setFieldValue(`products.${ticketIndex}.first_name`, me.first_name || "");
+        form.setFieldValue(`products.${ticketIndex}.last_name`, me.last_name || "");
+        form.setFieldValue(`products.${ticketIndex}.email`, me.email || "");
+        form.setFieldValue(`products.${ticketIndex}.birth_date`, me.birth_date || "");
+        form.setFieldValue(`products.${ticketIndex}.gender`, normalizeGender(me.gender));
+    };
+
+    const clearTicketProfileFields = (ticketIndex: number) => {
+        form.setFieldValue(`products.${ticketIndex}.first_name`, "");
+        form.setFieldValue(`products.${ticketIndex}.last_name`, "");
+        form.setFieldValue(`products.${ticketIndex}.email`, "");
+        form.setFieldValue(`products.${ticketIndex}.birth_date`, "");
+        form.setFieldValue(`products.${ticketIndex}.gender`, "");
+    };
+
+    const normalizeGender = (gender?: string) => {
+        if (!gender) {
+            return "";
+        }
+        const normalized = gender.toLowerCase();
+        if (normalized === "m" || normalized === "male") {
+            return "M";
+        }
+        if (normalized === "f" || normalized === "female") {
+            return "F";
+        }
+        return "";
+    };
 
     const createFormOrderQuestions = () => {
         const formOrderQuestions: any = [];
@@ -290,22 +376,23 @@ export const CollectInformation = () => {
 
                 <Card>
                     <InputGroup>
-                        <TextInput
-                            withAsterisk
-                            label={t`First Name`}
-                            placeholder={t`First name`}
-                            {...form.getInputProps("order.first_name")}
-                        />
-                        <TextInput
-                            withAsterisk
-                            label={t`Last Name`}
-                            placeholder={t`Last Name`}
-                            {...form.getInputProps("order.last_name")}
-                        />
+                    <TextInput
+                        withAsterisk
+                        label={t`First Name`}
+                        placeholder={t`First name`}
+                        {...form.getInputProps("order.first_name")}
+                        disabled={isProfileDetailsLocked}
+                    />
+                    <TextInput
+                        withAsterisk
+                        label={t`Last Name`}
+                        placeholder={t`Last Name`}
+                        {...form.getInputProps("order.last_name")}
+                        disabled={isProfileDetailsLocked}
+                    />
                     </InputGroup>
 
                     <TextInput
-                        withAsterisk
                         label={t`Club`}
                         placeholder={t`Club`}
                         {...form.getInputProps("order.club_name")}
@@ -317,7 +404,23 @@ export const CollectInformation = () => {
                         label={t`Email Address`}
                         placeholder={t`Email Address`}
                         {...form.getInputProps("order.email")}
+                        disabled={isProfileDetailsLocked}
                     />
+
+                    {me && (
+                        <Checkbox
+                            mt="sm"
+                            label={t`Use my profile details`}
+                            onChange={(event) => {
+                                if (event.currentTarget.checked) {
+                                    fillFromProfile();
+                                    setIsProfileDetailsLocked(true);
+                                } else {
+                                    setIsProfileDetailsLocked(false);
+                                }
+                            }}
+                        />
+                    )}
 
                     {orderRequiresAttendeeDetails && (
                         <Button p={0} ml={0} size={'sm'} variant={'transparent'} leftSection={<IconCopy size={14}/>}
@@ -398,6 +501,8 @@ export const CollectInformation = () => {
                         <div key={orderItem.product_id + orderItem.id}>
                             <h3>{orderItem?.item_name}</h3>
                             {Array.from(Array(orderItem?.quantity)).map((_, index) => {
+                                const currentTicketIndex = productIndex;
+                                const isProfileLocked = profileTicketIndex === currentTicketIndex;
                                 const productInputs = (
                                     <>
                                         <Card key={`${orderItem.id} ${index}`}>
@@ -412,31 +517,70 @@ export const CollectInformation = () => {
                                                         withAsterisk
                                                         label={t`First Name`}
                                                         placeholder={t`First name`}
-                                                        {...form.getInputProps(`products.${productIndex}.first_name`)}
+                                                        {...form.getInputProps(`products.${currentTicketIndex}.first_name`)}
+                                                        disabled={isProfileLocked}
                                                         />
                                                         <TextInput
                                                         withAsterisk
                                                         label={t`Last Name`}
                                                         placeholder={t`Last Name`}
-                                                        {...form.getInputProps(`products.${productIndex}.last_name`)}
+                                                        {...form.getInputProps(`products.${currentTicketIndex}.last_name`)}
+                                                        disabled={isProfileLocked}
                                                     />
                                                 </InputGroup>
 
                                                 <TextInput
-                                                    withAsterisk
                                                     label={t`Club`}
                                                     placeholder={t`Club`}
-                                                    {...form.getInputProps(`products.${productIndex}.club_name`)}
+                                                    {...form.getInputProps(`products.${currentTicketIndex}.club_name`)}
                                                 />
 
                                                 <TextInput
                                                     withAsterisk
                                                     label={t`Email Address`}
                                                     placeholder={t`Email Address`}
-                                                        {...form.getInputProps(`products.${productIndex}.email`)}
+                                                        {...form.getInputProps(`products.${currentTicketIndex}.email`)}
+                                                        disabled={isProfileLocked}
                                                     />
-                                                </>
-                                            )}
+                                                {me && (
+                                                    <Checkbox
+                                                        mt="sm"
+                                                        label={t`Use my profile details`}
+                                                        checked={profileTicketIndex === currentTicketIndex}
+                                                        onChange={(event) => {
+                                                            if (event.currentTarget.checked) {
+                                                                if (profileTicketIndex !== null && profileTicketIndex !== currentTicketIndex) {
+                                                                    clearTicketProfileFields(profileTicketIndex);
+                                                                }
+                                                                setProfileTicketIndex(currentTicketIndex);
+                                                                fillTicketFromProfile(currentTicketIndex);
+                                                            } else {
+                                                                setProfileTicketIndex(null);
+                                                                clearTicketProfileFields(currentTicketIndex);
+                                                            }
+                                                        }}
+                                                    />
+                                                )}
+                                                <InputGroup>
+                                                    <TextInput
+                                                        withAsterisk
+                                                        type="date"
+                                                        label={t`Date of birth`}
+                                                        max={today}
+                                                        {...form.getInputProps(`products.${currentTicketIndex}.birth_date`)}
+                                                        disabled={isProfileLocked}
+                                                    />
+                                                    <Select
+                                                        withAsterisk
+                                                        label={t`Gender`}
+                                                        data={genderOptions}
+                                                        placeholder={t`Select gender`}
+                                                        {...form.getInputProps(`products.${currentTicketIndex}.gender`)}
+                                                        disabled={isProfileLocked}
+                                                    />
+                                                </InputGroup>
+                                            </>
+                                        )}
 
                                             {productQuestions &&
                                                 <CheckoutProductQuestions
